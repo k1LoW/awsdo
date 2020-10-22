@@ -12,5 +12,5 @@ Enter MFA token code: 123456
 
 ## Required IAM permission
 
-- `iam:ListVirtualMFADevices`
+- `iam:ListMFADevices`
 - `sts:GetSessionToken`

@@ -45,42 +45,48 @@ var rootCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
 		sess := session.Must(session.NewSession())
-		stsSvc := sts.New(sess)
-		me, err := stsSvc.GetCallerIdentityWithContext(ctx, &sts.GetCallerIdentityInput{})
-		if err != nil {
-			cmd.PrintErrln(err)
-			os.Exit(1)
-		}
-		userArn := me.Arn
-		iamSvc := iam.New(sess)
-		status := iam.AssignmentStatusTypeAssigned
-		vdevs, err := iamSvc.ListVirtualMFADevicesWithContext(ctx, &iam.ListVirtualMFADevicesInput{
-			AssignmentStatus: &status,
-		})
-		if err != nil {
-			cmd.PrintErrln(err)
-			os.Exit(1)
-		}
+		envs := os.Environ()
+
 		var sNum *string
-		for _, vdev := range vdevs.VirtualMFADevices {
-			if *vdev.User.Arn == *userArn {
-				sNum = vdev.SerialNumber
-				break
-			}
+		iamSvc := iam.New(sess)
+		devs, err := iamSvc.ListMFADevicesWithContext(ctx, &iam.ListMFADevicesInput{})
+		if err != nil {
+			cmd.PrintErrln(err)
+			os.Exit(1)
 		}
-		tokenCode := prompter.Prompt("Enter MFA token code", "")
-		sessToken, err := stsSvc.GetSessionTokenWithContext(ctx, &sts.GetSessionTokenInput{
-			SerialNumber: sNum,
-			TokenCode:    &tokenCode,
-		})
+
+		switch {
+		case len(devs.MFADevices) > 1:
+			l := []string{}
+			for _, d := range devs.MFADevices {
+				l = append(l, *d.SerialNumber)
+			}
+			selected := prompter.Choose("Which MFA devices do you use?", l, l[0])
+			sNum = &selected
+		case len(devs.MFADevices) == 1:
+			sNum = devs.MFADevices[0].SerialNumber
+		}
+
+		if sNum != nil {
+			stsSvc := sts.New(sess)
+			tokenCode := prompter.Prompt("Enter MFA token code", "")
+			sessToken, err := stsSvc.GetSessionTokenWithContext(ctx, &sts.GetSessionTokenInput{
+				SerialNumber: sNum,
+				TokenCode:    &tokenCode,
+			})
+			if err != nil {
+				cmd.PrintErrln(err)
+				os.Exit(1)
+			}
+			envs = append(envs, fmt.Sprintf("AWS_ACCESS_KEY_ID=%s", *sessToken.Credentials.AccessKeyId))
+			envs = append(envs, fmt.Sprintf("AWS_SECRET_ACCESS_KEY=%s", *sessToken.Credentials.SecretAccessKey))
+			envs = append(envs, fmt.Sprintf("AWS_SESSION_TOKEN=%s", *sessToken.Credentials.SessionToken))
+		}
+
 		command := args[0]
 		c := exec.Command(command, args[1:]...)
 		c.Stdout = os.Stderr
 		c.Stderr = os.Stderr
-		envs := os.Environ()
-		envs = append(envs, fmt.Sprintf("AWS_ACCESS_KEY_ID=%s", *sessToken.Credentials.AccessKeyId))
-		envs = append(envs, fmt.Sprintf("AWS_SECRET_ACCESS_KEY=%s", *sessToken.Credentials.SecretAccessKey))
-		envs = append(envs, fmt.Sprintf("AWS_SESSION_TOKEN=%s", *sessToken.Credentials.SessionToken))
 		c.Env = envs
 		if err := c.Run(); err != nil {
 			cmd.PrintErrln(err)
