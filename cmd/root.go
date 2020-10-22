@@ -46,7 +46,7 @@ var rootCmd = &cobra.Command{
 		ctx := context.Background()
 		sess := session.Must(session.NewSession())
 		stsSvc := sts.New(sess)
-		me, err := stsSvc.GetCallerIdentity(&sts.GetCallerIdentityInput{})
+		me, err := stsSvc.GetCallerIdentityWithContext(ctx, &sts.GetCallerIdentityInput{})
 		if err != nil {
 			cmd.PrintErrln(err)
 			os.Exit(1)
@@ -69,7 +69,7 @@ var rootCmd = &cobra.Command{
 			}
 		}
 		tokenCode := prompter.Prompt("Enter MFA token code", "")
-		sessToken, err := stsSvc.GetSessionToken(&sts.GetSessionTokenInput{
+		sessToken, err := stsSvc.GetSessionTokenWithContext(ctx, &sts.GetSessionTokenInput{
 			SerialNumber: sNum,
 			TokenCode:    &tokenCode,
 		})
