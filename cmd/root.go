@@ -27,7 +27,6 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/k1LoW/awsdo/token"
 	"github.com/k1LoW/awsdo/version"
 	"github.com/spf13/cobra"
@@ -42,10 +41,10 @@ var rootCmd = &cobra.Command{
 	Version: version.Version,
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
-		sess := session.Must(session.NewSession())
+		profile := os.Getenv("AWS_PROFILE")
 		envs := os.Environ()
 
-		creds, err := token.GetCredentials(ctx, sess)
+		creds, err := token.GetCredentials(ctx, profile)
 		if err != nil {
 			cmd.PrintErrln(err)
 			os.Exit(1)

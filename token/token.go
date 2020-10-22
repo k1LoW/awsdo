@@ -16,7 +16,11 @@ type Credentials struct {
 }
 
 // GetCredentials
-func GetCredentials(ctx context.Context, sess *session.Session) (*Credentials, error) {
+func GetCredentials(ctx context.Context, profile string) (*Credentials, error) {
+	if profile == "" {
+		profile = "default"
+	}
+	sess := session.Must(session.NewSessionWithOptions(session.Options{Profile: profile}))
 	var creds *Credentials
 	var sNum *string
 	iamSvc := iam.New(sess)
