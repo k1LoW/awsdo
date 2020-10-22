@@ -56,24 +56,24 @@ func GetCredentials(ctx context.Context, profile string) (*Credentials, error) {
 		sNum = devs.MFADevices[0].SerialNumber
 	}
 
+	opt := &sts.GetSessionTokenInput{}
 	if sNum != nil {
-		stsSvc := sts.New(sess)
 		tokenCode := prompter.Prompt("Enter MFA token code", "")
-		sessToken, err := stsSvc.GetSessionTokenWithContext(ctx, &sts.GetSessionTokenInput{
-			SerialNumber: sNum,
-			TokenCode:    &tokenCode,
-		})
-		if err != nil {
-			return creds, err
-		}
-		if err := saveSessionTokenAsCache(profile, sessToken); err != nil {
-			return creds, err
-		}
-		creds = &Credentials{
-			AccessKeyId:     *sessToken.Credentials.AccessKeyId,
-			SecretAccessKey: *sessToken.Credentials.SecretAccessKey,
-			SessionToken:    *sessToken.Credentials.SessionToken,
-		}
+		opt.SerialNumber = sNum
+		opt.TokenCode = &tokenCode
+	}
+	stsSvc := sts.New(sess)
+	sessToken, err := stsSvc.GetSessionTokenWithContext(ctx, opt)
+	if err != nil {
+		return creds, err
+	}
+	if err := saveSessionTokenAsCache(profile, sessToken); err != nil {
+		return creds, err
+	}
+	creds = &Credentials{
+		AccessKeyId:     *sessToken.Credentials.AccessKeyId,
+		SecretAccessKey: *sessToken.Credentials.SecretAccessKey,
+		SessionToken:    *sessToken.Credentials.SessionToken,
 	}
 	return creds, nil
 }

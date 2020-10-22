@@ -1,5 +1,7 @@
 # awsdo
 
+AWS temporary credential (aka session token) wrapper.
+
 ## Usage
 
 ``` console

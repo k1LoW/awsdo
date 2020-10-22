@@ -35,8 +35,8 @@ import (
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:     "awsdo",
-	Short:   "awsdo",
-	Long:    `awsdo.`,
+	Short:   "AWS temporary credential (aka session token) wrapper",
+	Long:    `AWS temporary credential (aka session token) wrapper.`,
 	Args:    cobra.MinimumNArgs(1),
 	Version: version.Version,
 	Run: func(cmd *cobra.Command, args []string) {
