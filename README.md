@@ -24,29 +24,29 @@ Enter MFA token code: 123456
 Use [dpkg-i-from-url](https://github.com/k1LoW/dpkg-i-from-url)
 
 ``` console
-$ export AWSGO_VERSION=X.X.X
-$ curl -L https://git.io/dpkg-i-from-url | bash -s -- https://github.com/k1LoW/awsgo/releases/download/v$AWSGO_VERSION/awsgo_$AWSGO_VERSION-1_amd64.deb
+$ export AWSDO_VERSION=X.X.X
+$ curl -L https://git.io/dpkg-i-from-url | bash -s -- https://github.com/k1LoW/awsdo/releases/download/v$AWSDO_VERSION/awsdo_$AWSDO_VERSION-1_amd64.deb
 ```
 
 **RPM:**
 
 ``` console
-$ export AWSGO_VERSION=X.X.X
-$ yum install https://github.com/k1LoW/awsgo/releases/download/v$AWSGO_VERSION/awsgo_$AWSGO_VERSION-1_amd64.rpm
+$ export AWSDO_VERSION=X.X.X
+$ yum install https://github.com/k1LoW/awsdo/releases/download/v$AWSDO_VERSION/awsdo_$AWSDO_VERSION-1_amd64.rpm
 ```
 
 **homebrew tap:**
 
 ```console
-$ brew install k1LoW/tap/awsgo
+$ brew install k1LoW/tap/awsdo
 ```
 
 **manually:**
 
-Download binary from [releases page](https://github.com/k1LoW/awsgo/releases)
+Download binary from [releases page](https://github.com/k1LoW/awsdo/releases)
 
 **go get:**
 
 ```console
-$ go get github.com/k1LoW/tbls
+$ go get github.com/k1LoW/awsdo
 ```
