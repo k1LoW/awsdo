@@ -27,10 +27,8 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/Songmu/prompter"
 	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/iam"
-	"github.com/aws/aws-sdk-go/service/sts"
+	"github.com/k1LoW/awsdo/token"
 	"github.com/k1LoW/awsdo/version"
 	"github.com/spf13/cobra"
 )
@@ -47,40 +45,15 @@ var rootCmd = &cobra.Command{
 		sess := session.Must(session.NewSession())
 		envs := os.Environ()
 
-		var sNum *string
-		iamSvc := iam.New(sess)
-		devs, err := iamSvc.ListMFADevicesWithContext(ctx, &iam.ListMFADevicesInput{})
+		creds, err := token.GetCredentials(ctx, sess)
 		if err != nil {
 			cmd.PrintErrln(err)
 			os.Exit(1)
 		}
-
-		switch {
-		case len(devs.MFADevices) > 1:
-			l := []string{}
-			for _, d := range devs.MFADevices {
-				l = append(l, *d.SerialNumber)
-			}
-			selected := prompter.Choose("Which MFA devices do you use?", l, l[0])
-			sNum = &selected
-		case len(devs.MFADevices) == 1:
-			sNum = devs.MFADevices[0].SerialNumber
-		}
-
-		if sNum != nil {
-			stsSvc := sts.New(sess)
-			tokenCode := prompter.Prompt("Enter MFA token code", "")
-			sessToken, err := stsSvc.GetSessionTokenWithContext(ctx, &sts.GetSessionTokenInput{
-				SerialNumber: sNum,
-				TokenCode:    &tokenCode,
-			})
-			if err != nil {
-				cmd.PrintErrln(err)
-				os.Exit(1)
-			}
-			envs = append(envs, fmt.Sprintf("AWS_ACCESS_KEY_ID=%s", *sessToken.Credentials.AccessKeyId))
-			envs = append(envs, fmt.Sprintf("AWS_SECRET_ACCESS_KEY=%s", *sessToken.Credentials.SecretAccessKey))
-			envs = append(envs, fmt.Sprintf("AWS_SESSION_TOKEN=%s", *sessToken.Credentials.SessionToken))
+		if creds != nil {
+			envs = append(envs, fmt.Sprintf("AWS_ACCESS_KEY_ID=%s", creds.AccessKeyId))
+			envs = append(envs, fmt.Sprintf("AWS_SECRET_ACCESS_KEY=%s", creds.SecretAccessKey))
+			envs = append(envs, fmt.Sprintf("AWS_SESSION_TOKEN=%s", creds.SessionToken))
 		}
 
 		command := args[0]
