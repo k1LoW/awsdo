@@ -1,4 +1,4 @@
-package token
+package ini
 
 import (
 	"fmt"
@@ -8,12 +8,12 @@ import (
 	"gopkg.in/ini.v1"
 )
 
-type Inis struct {
+type Ini struct {
 	configIni *ini.File
 	credsIni  *ini.File
 }
 
-func (i *Inis) GetKey(profile, key string) string {
+func (i *Ini) GetKey(profile, key string) string {
 	switch {
 	case i.credsIni.Section(profile).Key(key).String() != "":
 		return i.credsIni.Section(profile).Key(key).String()
@@ -31,7 +31,7 @@ func (i *Inis) GetKey(profile, key string) string {
 	return ""
 }
 
-func NewInis() (*Inis, error) {
+func New() (*Ini, error) {
 	home, err := os.UserHomeDir()
 	if err != nil {
 		return nil, err
@@ -49,7 +49,7 @@ func NewInis() (*Inis, error) {
 		return nil, err
 	}
 
-	return &Inis{
+	return &Ini{
 		configIni: configIni,
 		credsIni:  credsIni,
 	}, nil

@@ -14,6 +14,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/iam"
 	"github.com/aws/aws-sdk-go/service/sts"
+	"github.com/k1LoW/awsdo/ini"
 	"github.com/k1LoW/duration"
 )
 
@@ -71,7 +72,6 @@ func TokenCode(tokenCode string) Option {
 	}
 }
 
-// GetCredentials
 func GetCredentials(ctx context.Context, options ...Option) (*Credentials, error) {
 	c := &Config{}
 	for _, option := range options {
@@ -80,7 +80,7 @@ func GetCredentials(ctx context.Context, options ...Option) (*Credentials, error
 		}
 	}
 
-	inis, err := NewInis()
+	i, err := ini.New()
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +88,7 @@ func GetCredentials(ctx context.Context, options ...Option) (*Credentials, error
 	cache, err := getSessionTokenFromCache(c.profile)
 	if err == nil {
 		return &Credentials{
-			Region:          inis.GetKey(c.profile, "region"),
+			Region:          i.GetKey(c.profile, "region"),
 			AccessKeyId:     *cache.Credentials.AccessKeyId,
 			SecretAccessKey: *cache.Credentials.SecretAccessKey,
 			SessionToken:    *cache.Credentials.SessionToken,
@@ -135,7 +135,7 @@ func GetCredentials(ctx context.Context, options ...Option) (*Credentials, error
 		return creds, err
 	}
 	creds = &Credentials{
-		Region:          inis.GetKey(c.profile, "region"),
+		Region:          i.GetKey(c.profile, "region"),
 		AccessKeyId:     *sessToken.Credentials.AccessKeyId,
 		SecretAccessKey: *sessToken.Credentials.SecretAccessKey,
 		SessionToken:    *sessToken.Credentials.SessionToken,
