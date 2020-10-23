@@ -89,17 +89,56 @@ func Get(ctx context.Context, options ...Option) (*Token, error) {
 	if err == nil {
 		return &Token{
 			Region:          i.GetKey(c.profile, "region"),
-			AccessKeyId:     *cache.Credentials.AccessKeyId,
-			SecretAccessKey: *cache.Credentials.SecretAccessKey,
-			SessionToken:    *cache.Credentials.SessionToken,
+			AccessKeyId:     *cache.AccessKeyId,
+			SecretAccessKey: *cache.SecretAccessKey,
+			SessionToken:    *cache.SessionToken,
 		}, nil
 	}
-	sess := session.Must(session.NewSessionWithOptions(session.Options{Profile: c.profile}))
 	var t *Token
 
 	if c.sNum == "" {
 		c.sNum = i.GetKey(c.profile, "mfa_serial")
 	}
+
+	// aws sts assume-role
+	roleArn := i.GetKey(c.profile, "role_arn")
+	sourceProfile := i.GetKey(c.profile, "source_profile")
+	if roleArn != "" && sourceProfile != "" {
+		sess := session.Must(session.NewSessionWithOptions(session.Options{Profile: sourceProfile}))
+		stsSvc := sts.New(sess)
+		if c.sNum != "" {
+			if c.tokenCode == "" {
+				c.tokenCode = prompter.Prompt(fmt.Sprintf("Enter MFA code for %s", c.sNum), "")
+			}
+		}
+		sessName := fmt.Sprintf("awsdo-session-%s-%d", sourceProfile, time.Now().Unix())
+		opt := &sts.AssumeRoleInput{
+			RoleSessionName: &sessName,
+			DurationSeconds: &c.durationSeconds,
+			RoleArn:         &roleArn,
+		}
+		if c.sNum != "" {
+			opt.SerialNumber = &c.sNum
+			opt.TokenCode = &c.tokenCode
+		}
+		assueRoleOut, err := stsSvc.AssumeRoleWithContext(ctx, opt)
+		if err != nil {
+			return t, err
+		}
+		if err := saveSessionTokenAsCache(c.profile, assueRoleOut.Credentials); err != nil {
+			return t, err
+		}
+		t = &Token{
+			Region:          i.GetKey(c.profile, "region"),
+			AccessKeyId:     *assueRoleOut.Credentials.AccessKeyId,
+			SecretAccessKey: *assueRoleOut.Credentials.SecretAccessKey,
+			SessionToken:    *assueRoleOut.Credentials.SessionToken,
+		}
+		return t, nil
+	}
+
+	sess := session.Must(session.NewSessionWithOptions(session.Options{Profile: c.profile}))
+	stsSvc := sts.New(sess)
 
 	if c.sNum == "" {
 		iamSvc := iam.New(sess)
@@ -120,22 +159,25 @@ func Get(ctx context.Context, options ...Option) (*Token, error) {
 		}
 	}
 
+	if c.sNum != "" {
+		if c.tokenCode == "" {
+			c.tokenCode = prompter.Prompt(fmt.Sprintf("Enter MFA code for %s", c.sNum), "")
+		}
+	}
+
+	// aws sts get-session-token
 	opt := &sts.GetSessionTokenInput{
 		DurationSeconds: &c.durationSeconds,
 	}
 	if c.sNum != "" {
 		opt.SerialNumber = &c.sNum
-		if c.tokenCode == "" {
-			c.tokenCode = prompter.Prompt("Enter MFA token code", "")
-		}
 		opt.TokenCode = &c.tokenCode
 	}
-	stsSvc := sts.New(sess)
 	sessToken, err := stsSvc.GetSessionTokenWithContext(ctx, opt)
 	if err != nil {
 		return t, err
 	}
-	if err := saveSessionTokenAsCache(c.profile, sessToken); err != nil {
+	if err := saveSessionTokenAsCache(c.profile, sessToken.Credentials); err != nil {
 		return t, err
 	}
 	t = &Token{
@@ -147,32 +189,32 @@ func Get(ctx context.Context, options ...Option) (*Token, error) {
 	return t, nil
 }
 
-func saveSessionTokenAsCache(profile string, sessToken *sts.GetSessionTokenOutput) error {
+func saveSessionTokenAsCache(profile string, creds *sts.Credentials) error {
 	if _, err := os.Stat(dataPath()); err != nil {
 		if err := os.MkdirAll(dataPath(), 0700); err != nil {
 			return err
 		}
 	}
-	out, err := json.Marshal(sessToken)
+	out, err := json.Marshal(creds)
 	if err != nil {
 		return err
 	}
 	return ioutil.WriteFile(cachePath(profile), out, 0600)
 }
 
-func getSessionTokenFromCache(profile string) (*sts.GetSessionTokenOutput, error) {
-	var sessToken sts.GetSessionTokenOutput
+func getSessionTokenFromCache(profile string) (*sts.Credentials, error) {
+	var creds sts.Credentials
 	cache, err := ioutil.ReadFile(cachePath(profile))
 	if err != nil {
-		return &sessToken, err
+		return &creds, err
 	}
-	if err := json.Unmarshal(cache, &sessToken); err != nil {
-		return &sessToken, err
+	if err := json.Unmarshal(cache, &creds); err != nil {
+		return &creds, err
 	}
-	if time.Now().After(*sessToken.Credentials.Expiration) {
-		return &sessToken, errors.New("session token expired")
+	if time.Now().After(*creds.Expiration) {
+		return &creds, errors.New("session token expired")
 	}
-	return &sessToken, nil
+	return &creds, nil
 }
 
 func cachePath(profile string) string {

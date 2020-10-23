@@ -1,16 +1,10 @@
 # awsdo
 
-AWS temporary credential (aka session token) wrapper.
+`awsdo` is a tool to do anything using AWS temporary credentials.
 
 ## Usage
 
-``` ini
-# ~/.aws/credentials
-
-[myaws]
-aws_access_key_id=XXXXXXXxxxXxXXXXXXXXXXxxxx
-aws_secret_access_key=YYyyyYyyYyYYYYYYyyYyYYY
-```
+`awsdo` does anything with temporary credentials generated using `aws sts get-session-token` and `aws sts assume-role`.
 
 ### As command wrapper
 
@@ -24,7 +18,7 @@ Enter MFA token code: 123456
 
 ### As env exporter
 
-When awsgo is executed with no arguments, awsgo outputs shell script to export AWS credentials environment variables like [aswrap](https://github.com/fujiwara/aswrap).
+When `awsdo` is executed with no arguments, `awsdo` outputs shell script to export AWS credentials environment variables like [`aswrap`](https://github.com/fujiwara/aswrap).
 
 ``` console
 $ export AWS_PROFILE=myaws awsdo
@@ -41,9 +35,10 @@ If you want to set credentials in a current shell by `eval`, you can use `--toke
 $ eval "$(awsdo --profile myaws --token-code 123456)"
 ```
 
-## Required IAM permission
+## Required IAM permissions
 
 - `iam:ListMFADevices`
+- `sts:AssumeRole`
 - `sts:GetSessionToken`
 
 ## Install
