@@ -98,6 +98,10 @@ func GetCredentials(ctx context.Context, options ...Option) (*Credentials, error
 	var creds *Credentials
 
 	if c.sNum == "" {
+		c.sNum = i.GetKey(c.profile, "mfa_serial")
+	}
+
+	if c.sNum == "" {
 		iamSvc := iam.New(sess)
 		devs, err := iamSvc.ListMFADevicesWithContext(ctx, &iam.ListMFADevicesInput{})
 		if err != nil {
