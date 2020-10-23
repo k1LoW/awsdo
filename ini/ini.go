@@ -17,12 +17,12 @@ func (i *Ini) GetKey(profile, key string) string {
 	switch {
 	case i.credsIni.Section(profile).Key(key).String() != "":
 		return i.credsIni.Section(profile).Key(key).String()
-	case i.credsIni.Section(fmt.Sprintf("profile ", profile)).Key(key).String() != "":
-		return i.credsIni.Section(fmt.Sprintf("profile ", profile)).Key(key).String()
+	case i.credsIni.Section(fmt.Sprintf("profile %s", profile)).Key(key).String() != "":
+		return i.credsIni.Section(fmt.Sprintf("profile %s", profile)).Key(key).String()
 	case i.configIni.Section(profile).Key(key).String() != "":
 		return i.configIni.Section(profile).Key(key).String()
-	case i.configIni.Section(fmt.Sprintf("profile ", profile)).Key(key).String() != "":
-		return i.configIni.Section(fmt.Sprintf("profile ", profile)).Key(key).String()
+	case i.configIni.Section(fmt.Sprintf("profile %s", profile)).Key(key).String() != "":
+		return i.configIni.Section(fmt.Sprintf("profile %s", profile)).Key(key).String()
 	case i.credsIni.Section("default").Key(key).String() != "":
 		return i.credsIni.Section("default").Key(key).String()
 	case i.configIni.Section("default").Key(key).String() != "":
