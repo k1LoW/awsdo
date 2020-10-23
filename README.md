@@ -29,6 +29,7 @@ When awsgo is executed with no arguments, awsgo outputs shell script to export A
 ``` console
 $ export AWS_PROFILE=myaws awsdo
 Enter MFA token code: 123456
+export AWS_REGION=ap-northeast-1
 export AWS_ACCESS_KEY_ID=XXXXXXXXXXXXXXXX
 export AWS_SECRET_ACCESS_KEY=vl/Zv5hGxdy1DPh7IfpYwP/YKU8J6645...
 export AWS_SESSION_TOKEN=FwoGZXIYXdGUaFij9VStcW9fcbuKCKGAWjLxF/3hXgGSoemniFV...
