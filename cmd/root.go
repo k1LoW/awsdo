@@ -98,7 +98,7 @@ func Execute() {
 
 func init() {
 	rootCmd.Flags().StringVarP(&profile, "profile", "p", "", "AWS named profile")
-	rootCmd.Flags().StringVarP(&duration, "duration", "d", "12hours", "the duration that the credentials should remain valid")
+	rootCmd.Flags().StringVarP(&duration, "duration", "d", "1hour", "the duration that the credentials should remain valid")
 	rootCmd.Flags().StringVarP(&sNum, "serial-number", "n", "", "the identification number of the MFA device")
 	rootCmd.Flags().StringVarP(&tokenCode, "token-code", "c", "", "the value provided by the MFA device")
 }
