@@ -1,6 +1,6 @@
 # awsdo
 
-AWS temporary credential (aka session token) wrapper.
+AWS temporary credential wrapper.
 
 ## Usage
 

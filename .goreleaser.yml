@@ -46,7 +46,7 @@ brews:
     name: k1LoW
     email: k1lowxb@gmail.com
   homepage: https://github.com/k1LoW/awsdo
-  description: AWS temporary credential (aka session token) wrapper.
+  description: AWS temporary credential wrapper.
 nfpms:
   -
     id: awsdo-nfpms
@@ -55,7 +55,7 @@ nfpms:
     - awsdo-linux
     homepage: https://github.com/k1LoW/awsdo
     maintainer: Ken'ichiro Oyama <k1lowxb@gmail.com>
-    description: AWS temporary credential (aka session token) wrapper.
+    description: AWS temporary credential wrapper.
     license: MIT
     formats:
       - deb
