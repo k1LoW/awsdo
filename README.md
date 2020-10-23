@@ -41,9 +41,10 @@ If you want to set credentials in a current shell by `eval`, you can use `--toke
 $ eval "$(awsdo --profile myaws --token-code 123456)"
 ```
 
-## Required IAM permission
+## Required IAM permissions
 
 - `iam:ListMFADevices`
+- `sts:AssumeRole`
 - `sts:GetSessionToken`
 
 ## Install
