@@ -41,8 +41,8 @@ var (
 
 var rootCmd = &cobra.Command{
 	Use:     "awsdo",
-	Short:   "AWS temporary credential wrapper",
-	Long:    `AWS temporary credential wrapper.`,
+	Short:   "awsdo is a tool to do anything using AWS temporary credentials",
+	Long:    `awsdo is a tool to do anything using AWS temporary credentials.`,
 	Version: version.Version,
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
