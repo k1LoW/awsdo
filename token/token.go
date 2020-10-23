@@ -14,6 +14,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/iam"
 	"github.com/aws/aws-sdk-go/service/sts"
+	"github.com/k1LoW/duration"
 )
 
 type Credentials struct {
@@ -22,12 +23,62 @@ type Credentials struct {
 	SessionToken    string
 }
 
-// GetCredentials
-func GetCredentials(ctx context.Context, profile string) (*Credentials, error) {
-	if profile == "" {
-		profile = "default"
+type Config struct {
+	profile         string
+	durationSeconds int64
+	sNum            string
+	tokenCode       string
+}
+
+type Option func(*Config) error
+
+func Profile(profile string) Option {
+	return func(c *Config) error {
+		if profile == "" {
+			profile = os.Getenv("AWS_PROFILE")
+		}
+		if profile == "" {
+			profile = "default"
+		}
+		c.profile = profile
+		return nil
 	}
-	cache, err := getSessionTokenFromCache(profile)
+}
+
+func Duration(s string) Option {
+	return func(c *Config) error {
+		d, err := duration.Parse(s)
+		if err != nil {
+			return err
+		}
+		c.durationSeconds = int64(d.Seconds())
+		return nil
+	}
+}
+
+func SerialNumber(sNum string) Option {
+	return func(c *Config) error {
+		c.sNum = sNum
+		return nil
+	}
+}
+
+func TokenCode(tokenCode string) Option {
+	return func(c *Config) error {
+		c.tokenCode = tokenCode
+		return nil
+	}
+}
+
+// GetCredentials
+func GetCredentials(ctx context.Context, options ...Option) (*Credentials, error) {
+	c := &Config{}
+	for _, option := range options {
+		if err := option(c); err != nil {
+			return nil, err
+		}
+	}
+	cache, err := getSessionTokenFromCache(c.profile)
 	if err == nil {
 		return &Credentials{
 			AccessKeyId:     *cache.Credentials.AccessKeyId,
@@ -35,39 +86,44 @@ func GetCredentials(ctx context.Context, profile string) (*Credentials, error) {
 			SessionToken:    *cache.Credentials.SessionToken,
 		}, nil
 	}
-	sess := session.Must(session.NewSessionWithOptions(session.Options{Profile: profile}))
+	sess := session.Must(session.NewSessionWithOptions(session.Options{Profile: c.profile}))
 	var creds *Credentials
-	var sNum *string
-	iamSvc := iam.New(sess)
-	devs, err := iamSvc.ListMFADevicesWithContext(ctx, &iam.ListMFADevicesInput{})
-	if err != nil {
-		return creds, err
-	}
 
-	switch {
-	case len(devs.MFADevices) > 1:
-		l := []string{}
-		for _, d := range devs.MFADevices {
-			l = append(l, *d.SerialNumber)
+	if c.sNum == "" {
+		iamSvc := iam.New(sess)
+		devs, err := iamSvc.ListMFADevicesWithContext(ctx, &iam.ListMFADevicesInput{})
+		if err != nil {
+			return creds, err
 		}
-		selected := prompter.Choose("Which MFA devices do you use?", l, l[0])
-		sNum = &selected
-	case len(devs.MFADevices) == 1:
-		sNum = devs.MFADevices[0].SerialNumber
+
+		switch {
+		case len(devs.MFADevices) > 1:
+			l := []string{}
+			for _, d := range devs.MFADevices {
+				l = append(l, *d.SerialNumber)
+			}
+			c.sNum = prompter.Choose("Which MFA devices do you use?", l, l[0])
+		case len(devs.MFADevices) == 1:
+			c.sNum = *devs.MFADevices[0].SerialNumber
+		}
 	}
 
-	opt := &sts.GetSessionTokenInput{}
-	if sNum != nil {
-		tokenCode := prompter.Prompt("Enter MFA token code", "")
-		opt.SerialNumber = sNum
-		opt.TokenCode = &tokenCode
+	opt := &sts.GetSessionTokenInput{
+		DurationSeconds: &c.durationSeconds,
+	}
+	if c.sNum != "" {
+		opt.SerialNumber = &c.sNum
+		if c.tokenCode == "" {
+			c.tokenCode = prompter.Prompt("Enter MFA token code", "")
+		}
+		opt.TokenCode = &c.tokenCode
 	}
 	stsSvc := sts.New(sess)
 	sessToken, err := stsSvc.GetSessionTokenWithContext(ctx, opt)
 	if err != nil {
 		return creds, err
 	}
-	if err := saveSessionTokenAsCache(profile, sessToken); err != nil {
+	if err := saveSessionTokenAsCache(c.profile, sessToken); err != nil {
 		return creds, err
 	}
 	creds = &Credentials{
