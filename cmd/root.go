@@ -32,7 +32,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// rootCmd represents the base command when called without any subcommands
+var (
+	profile   string
+	duration  string
+	sNum      string
+	tokenCode string
+)
+
 var rootCmd = &cobra.Command{
 	Use:     "awsdo",
 	Short:   "AWS temporary credential (aka session token) wrapper",
@@ -41,10 +47,13 @@ var rootCmd = &cobra.Command{
 	Version: version.Version,
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
-		profile := os.Getenv("AWS_PROFILE")
 		envs := os.Environ()
 
-		creds, err := token.GetCredentials(ctx, profile)
+		creds, err := token.GetCredentials(ctx,
+			token.Profile(profile),
+			token.Duration(duration),
+			token.SerialNumber(sNum),
+			token.TokenCode(tokenCode))
 		if err != nil {
 			cmd.PrintErrln(err)
 			os.Exit(1)
@@ -76,4 +85,9 @@ func Execute() {
 	}
 }
 
-func init() {}
+func init() {
+	rootCmd.Flags().StringVarP(&profile, "profile", "p", "", "AWS profile")
+	rootCmd.Flags().StringVarP(&duration, "duration", "d", "12hours", "the duration that the credentials should remain valid")
+	rootCmd.Flags().StringVarP(&sNum, "serial-number", "n", "", "the identification number of the MFA device")
+	rootCmd.Flags().StringVarP(&tokenCode, "token-code", "c", "", "the value provided by the MFA device")
+}
