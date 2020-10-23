@@ -59,6 +59,9 @@ var rootCmd = &cobra.Command{
 		}
 
 		if len(args) == 0 {
+			if creds.Region != "" {
+				cmd.Printf("export AWS_REGION=%s\n", creds.Region)
+			}
 			cmd.Printf("export AWS_ACCESS_KEY_ID=%s\n", creds.AccessKeyId)
 			cmd.Printf("export AWS_SECRET_ACCESS_KEY=%s\n", creds.SecretAccessKey)
 			cmd.Printf("export AWS_SESSION_TOKEN=%s\n", creds.SessionToken)
@@ -66,6 +69,9 @@ var rootCmd = &cobra.Command{
 		}
 
 		if creds != nil {
+			if creds.Region != "" {
+				envs = append(envs, fmt.Sprintf("AWS_REGION=%s", creds.Region))
+			}
 			envs = append(envs, fmt.Sprintf("AWS_ACCESS_KEY_ID=%s", creds.AccessKeyId))
 			envs = append(envs, fmt.Sprintf("AWS_SECRET_ACCESS_KEY=%s", creds.SecretAccessKey))
 			envs = append(envs, fmt.Sprintf("AWS_SESSION_TOKEN=%s", creds.SessionToken))

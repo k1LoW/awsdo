@@ -18,6 +18,7 @@ import (
 )
 
 type Credentials struct {
+	Region          string
 	AccessKeyId     string
 	SecretAccessKey string
 	SessionToken    string
@@ -78,9 +79,16 @@ func GetCredentials(ctx context.Context, options ...Option) (*Credentials, error
 			return nil, err
 		}
 	}
+
+	inis, err := NewInis()
+	if err != nil {
+		return nil, err
+	}
+
 	cache, err := getSessionTokenFromCache(c.profile)
 	if err == nil {
 		return &Credentials{
+			Region:          inis.GetKey(c.profile, "region"),
 			AccessKeyId:     *cache.Credentials.AccessKeyId,
 			SecretAccessKey: *cache.Credentials.SecretAccessKey,
 			SessionToken:    *cache.Credentials.SessionToken,
@@ -127,6 +135,7 @@ func GetCredentials(ctx context.Context, options ...Option) (*Credentials, error
 		return creds, err
 	}
 	creds = &Credentials{
+		Region:          inis.GetKey(c.profile, "region"),
 		AccessKeyId:     *sessToken.Credentials.AccessKeyId,
 		SecretAccessKey: *sessToken.Credentials.SecretAccessKey,
 		SessionToken:    *sessToken.Credentials.SessionToken,
@@ -169,7 +178,7 @@ func cachePath(profile string) string {
 func dataPath() string {
 	p := os.Getenv("XDG_DATA_HOME")
 	if p == "" {
-		home := os.Getenv("HOME")
+		home, _ := os.UserHomeDir()
 		p = filepath.Join(home, ".local", "share")
 	}
 	return filepath.Join(p, "awsgo")
