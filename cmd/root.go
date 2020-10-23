@@ -43,7 +43,6 @@ var rootCmd = &cobra.Command{
 	Use:     "awsdo",
 	Short:   "AWS temporary credential (aka session token) wrapper",
 	Long:    `AWS temporary credential (aka session token) wrapper.`,
-	Args:    cobra.MinimumNArgs(1),
 	Version: version.Version,
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
@@ -58,12 +57,19 @@ var rootCmd = &cobra.Command{
 			cmd.PrintErrln(err)
 			os.Exit(1)
 		}
+
+		if len(args) == 0 {
+			cmd.Printf("export AWS_ACCESS_KEY_ID=%s\n", creds.AccessKeyId)
+			cmd.Printf("export AWS_SECRET_ACCESS_KEY=%s\n", creds.SecretAccessKey)
+			cmd.Printf("export AWS_SESSION_TOKEN=%s\n", creds.SessionToken)
+			return
+		}
+
 		if creds != nil {
 			envs = append(envs, fmt.Sprintf("AWS_ACCESS_KEY_ID=%s", creds.AccessKeyId))
 			envs = append(envs, fmt.Sprintf("AWS_SECRET_ACCESS_KEY=%s", creds.SecretAccessKey))
 			envs = append(envs, fmt.Sprintf("AWS_SESSION_TOKEN=%s", creds.SessionToken))
 		}
-
 		command := args[0]
 		c := exec.Command(command, args[1:]...)
 		c.Stdout = os.Stderr
