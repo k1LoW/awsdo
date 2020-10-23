@@ -48,7 +48,7 @@ var rootCmd = &cobra.Command{
 		ctx := context.Background()
 		envs := os.Environ()
 
-		creds, err := token.GetCredentials(ctx,
+		t, err := token.Get(ctx,
 			token.Profile(profile),
 			token.Duration(duration),
 			token.SerialNumber(sNum),
@@ -58,24 +58,23 @@ var rootCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
+		// no arguments
 		if len(args) == 0 {
-			if creds.Region != "" {
-				cmd.Printf("export AWS_REGION=%s\n", creds.Region)
+			if t.Region != "" {
+				cmd.Printf("export AWS_REGION=%s\n", t.Region)
 			}
-			cmd.Printf("export AWS_ACCESS_KEY_ID=%s\n", creds.AccessKeyId)
-			cmd.Printf("export AWS_SECRET_ACCESS_KEY=%s\n", creds.SecretAccessKey)
-			cmd.Printf("export AWS_SESSION_TOKEN=%s\n", creds.SessionToken)
+			cmd.Printf("export AWS_ACCESS_KEY_ID=%s\n", t.AccessKeyId)
+			cmd.Printf("export AWS_SECRET_ACCESS_KEY=%s\n", t.SecretAccessKey)
+			cmd.Printf("export AWS_SESSION_TOKEN=%s\n", t.SessionToken)
 			return
 		}
 
-		if creds != nil {
-			if creds.Region != "" {
-				envs = append(envs, fmt.Sprintf("AWS_REGION=%s", creds.Region))
-			}
-			envs = append(envs, fmt.Sprintf("AWS_ACCESS_KEY_ID=%s", creds.AccessKeyId))
-			envs = append(envs, fmt.Sprintf("AWS_SECRET_ACCESS_KEY=%s", creds.SecretAccessKey))
-			envs = append(envs, fmt.Sprintf("AWS_SESSION_TOKEN=%s", creds.SessionToken))
+		if t.Region != "" {
+			envs = append(envs, fmt.Sprintf("AWS_REGION=%s", t.Region))
 		}
+		envs = append(envs, fmt.Sprintf("AWS_ACCESS_KEY_ID=%s", t.AccessKeyId))
+		envs = append(envs, fmt.Sprintf("AWS_SECRET_ACCESS_KEY=%s", t.SecretAccessKey))
+		envs = append(envs, fmt.Sprintf("AWS_SESSION_TOKEN=%s", t.SessionToken))
 		command := args[0]
 		c := exec.Command(command, args[1:]...)
 		c.Stdout = os.Stderr

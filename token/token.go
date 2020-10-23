@@ -18,7 +18,7 @@ import (
 	"github.com/k1LoW/duration"
 )
 
-type Credentials struct {
+type Token struct {
 	Region          string
 	AccessKeyId     string
 	SecretAccessKey string
@@ -72,7 +72,7 @@ func TokenCode(tokenCode string) Option {
 	}
 }
 
-func GetCredentials(ctx context.Context, options ...Option) (*Credentials, error) {
+func Get(ctx context.Context, options ...Option) (*Token, error) {
 	c := &Config{}
 	for _, option := range options {
 		if err := option(c); err != nil {
@@ -87,7 +87,7 @@ func GetCredentials(ctx context.Context, options ...Option) (*Credentials, error
 
 	cache, err := getSessionTokenFromCache(c.profile)
 	if err == nil {
-		return &Credentials{
+		return &Token{
 			Region:          i.GetKey(c.profile, "region"),
 			AccessKeyId:     *cache.Credentials.AccessKeyId,
 			SecretAccessKey: *cache.Credentials.SecretAccessKey,
@@ -95,7 +95,7 @@ func GetCredentials(ctx context.Context, options ...Option) (*Credentials, error
 		}, nil
 	}
 	sess := session.Must(session.NewSessionWithOptions(session.Options{Profile: c.profile}))
-	var creds *Credentials
+	var t *Token
 
 	if c.sNum == "" {
 		c.sNum = i.GetKey(c.profile, "mfa_serial")
@@ -105,7 +105,7 @@ func GetCredentials(ctx context.Context, options ...Option) (*Credentials, error
 		iamSvc := iam.New(sess)
 		devs, err := iamSvc.ListMFADevicesWithContext(ctx, &iam.ListMFADevicesInput{})
 		if err != nil {
-			return creds, err
+			return t, err
 		}
 
 		switch {
@@ -133,18 +133,18 @@ func GetCredentials(ctx context.Context, options ...Option) (*Credentials, error
 	stsSvc := sts.New(sess)
 	sessToken, err := stsSvc.GetSessionTokenWithContext(ctx, opt)
 	if err != nil {
-		return creds, err
+		return t, err
 	}
 	if err := saveSessionTokenAsCache(c.profile, sessToken); err != nil {
-		return creds, err
+		return t, err
 	}
-	creds = &Credentials{
+	t = &Token{
 		Region:          i.GetKey(c.profile, "region"),
 		AccessKeyId:     *sessToken.Credentials.AccessKeyId,
 		SecretAccessKey: *sessToken.Credentials.SecretAccessKey,
 		SessionToken:    *sessToken.Credentials.SessionToken,
 	}
-	return creds, nil
+	return t, nil
 }
 
 func saveSessionTokenAsCache(profile string, sessToken *sts.GetSessionTokenOutput) error {
