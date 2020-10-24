@@ -105,6 +105,22 @@ func Get(ctx context.Context, options ...Option) (*Token, error) {
 	sourceProfile := i.GetKey(c.profile, "source_profile")
 	if roleArn != "" && sourceProfile != "" {
 		sess := session.Must(session.NewSessionWithOptions(session.Options{Profile: sourceProfile}))
+		if c.sNum == "" {
+			iamSvc := iam.New(sess)
+			devs, _ := iamSvc.ListMFADevicesWithContext(ctx, &iam.ListMFADevicesInput{})
+			switch {
+			case devs == nil:
+				break
+			case len(devs.MFADevices) > 1:
+				l := []string{}
+				for _, d := range devs.MFADevices {
+					l = append(l, *d.SerialNumber)
+				}
+				c.sNum = prompter.Choose("Which MFA devices do you use?", l, l[0])
+			case len(devs.MFADevices) == 1:
+				c.sNum = *devs.MFADevices[0].SerialNumber
+			}
+		}
 		stsSvc := sts.New(sess)
 		if c.sNum != "" {
 			if c.tokenCode == "" {
