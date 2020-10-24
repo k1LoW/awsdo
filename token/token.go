@@ -158,12 +158,10 @@ func Get(ctx context.Context, options ...Option) (*Token, error) {
 
 	if c.sNum == "" {
 		iamSvc := iam.New(sess)
-		devs, err := iamSvc.ListMFADevicesWithContext(ctx, &iam.ListMFADevicesInput{})
-		if err != nil {
-			return t, err
-		}
-
+		devs, _ := iamSvc.ListMFADevicesWithContext(ctx, &iam.ListMFADevicesInput{})
 		switch {
+		case devs == nil:
+			break
 		case len(devs.MFADevices) > 1:
 			l := []string{}
 			for _, d := range devs.MFADevices {
