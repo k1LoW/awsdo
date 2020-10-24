@@ -1,5 +1,12 @@
 # Changelog
 
+## [v0.5.0](https://github.com/k1LoW/awsdo/compare/v0.4.0...v0.5.0) (2020-10-25)
+
+* Support external_id [#9](https://github.com/k1LoW/awsdo/pull/9) ([k1LoW](https://github.com/k1LoW))
+* When no `source_profile`, use default profile [#8](https://github.com/k1LoW/awsdo/pull/8) ([k1LoW](https://github.com/k1LoW))
+* If it fails to get the MFA device, don't make an error [#7](https://github.com/k1LoW/awsdo/pull/7) ([k1LoW](https://github.com/k1LoW))
+* Try to get the MFA device even in `sts assume-role` [#6](https://github.com/k1LoW/awsdo/pull/6) ([k1LoW](https://github.com/k1LoW))
+
 ## [v0.4.0](https://github.com/k1LoW/awsdo/compare/v0.3.0...v0.4.0) (2020-10-24)
 
 * Support Assume Role [#5](https://github.com/k1LoW/awsdo/pull/5) ([k1LoW](https://github.com/k1LoW))

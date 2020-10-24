@@ -51,7 +51,7 @@ $ eval "$(awsdo --profile myaws --token-code 123456)"
     - If the section does not have `mfa_serial`, `awsdo` tries to get the MFA device serial number ( `iam:ListMFADevices` ).
     - If `awsdo` get MFA device serial number, it uses multi-factor authentication.
     - Get temporary credentials.
-- Set the credentilas to environment variables.
+- Set the temporary credentials to environment variables.
     - `AWS_ACCESS_KEY_ID`
     - `AWS_SECRET_ACCESS_KEY`
     - `AWS_SESSION_TOKEN`
