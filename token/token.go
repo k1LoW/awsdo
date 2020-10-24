@@ -136,6 +136,10 @@ func Get(ctx context.Context, options ...Option) (*Token, error) {
 			DurationSeconds: &c.durationSeconds,
 			RoleArn:         &roleArn,
 		}
+		externalId := i.GetKey(c.profile, "external_id")
+		if externalId != "" {
+			opt.ExternalId = &externalId
+		}
 		if c.sNum != "" {
 			opt.SerialNumber = &c.sNum
 			opt.TokenCode = &c.tokenCode
