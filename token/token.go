@@ -103,7 +103,10 @@ func Get(ctx context.Context, options ...Option) (*Token, error) {
 	// aws sts assume-role
 	roleArn := i.GetKey(c.profile, "role_arn")
 	sourceProfile := i.GetKey(c.profile, "source_profile")
-	if roleArn != "" && sourceProfile != "" {
+	if roleArn != "" {
+		if sourceProfile == "" {
+			sourceProfile = "default"
+		}
 		sess := session.Must(session.NewSessionWithOptions(session.Options{Profile: sourceProfile}))
 		if c.sNum == "" {
 			iamSvc := iam.New(sess)
@@ -127,7 +130,7 @@ func Get(ctx context.Context, options ...Option) (*Token, error) {
 				c.tokenCode = prompter.Prompt(fmt.Sprintf("Enter MFA code for %s", c.sNum), "")
 			}
 		}
-		sessName := fmt.Sprintf("awsdo-session-%s-%d", sourceProfile, time.Now().Unix())
+		sessName := fmt.Sprintf("awsdo-session-%d", time.Now().Unix())
 		opt := &sts.AssumeRoleInput{
 			RoleSessionName: &sessName,
 			DurationSeconds: &c.durationSeconds,
