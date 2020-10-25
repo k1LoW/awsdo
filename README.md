@@ -43,20 +43,20 @@ $ eval "$(awsdo --profile myaws --token-code 123456)"
 
 - Load `~/.aws/credentials` and `~/.aws/config`.
 - Find profile ( section of `AWS_PROFILE` or `--profile` ).
-  1. If the section has `role_arn`, `awsdo` tries to assume role ( `sts:AssumeRole` ).
-    - If the section does not have `mfa_serial`, `awsdo` tries to get the MFA device serial number ( `iam:ListMFADevices` ).
-    - If `awsdo` get MFA device serial number, it uses multi-factor authentication.
-    - Get temporary credentials.
-  2. Else, `awsdo` try to get session token ( `sts:getSessionToken` ).
-    - If the section does not have `mfa_serial`, `awsdo` tries to get the MFA device serial number ( `iam:ListMFADevices` ).
-    - If `awsdo` get MFA device serial number, it uses multi-factor authentication.
-    - Get temporary credentials.
-- Set the temporary credentials to environment variables.
+- Get temporary credentials.
+    1. If the section has `role_arn`, `awsdo` tries to assume role ( `sts:AssumeRole` ).
+        - If the section does not have `mfa_serial`, `awsdo` tries to get the MFA device serial number ( `iam:ListMFADevices` ).
+        - If `awsdo` get MFA device serial number, it uses multi-factor authentication.
+        - Get temporary credentials.
+    2. Else, `awsdo` try to get session token ( `sts:getSessionToken` ).
+        - If the section does not have `mfa_serial`, `awsdo` tries to get the MFA device serial number ( `iam:ListMFADevices` ).
+        - If `awsdo` get MFA device serial number, it uses multi-factor authentication.
+        - Get temporary credentials.
+- Set the temporary credentials to environment variables and execute command or export environment variables.
     - `AWS_ACCESS_KEY_ID`
     - `AWS_SECRET_ACCESS_KEY`
     - `AWS_SESSION_TOKEN`
     - `AWS_REGION`
-- Execute command or export environment variables.
 
 ## Install
 
