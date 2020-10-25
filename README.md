@@ -10,7 +10,7 @@
 
 ``` console
 $ AWS_PROFILE=myaws awsdo -- terraform apply
-Enter MFA token code: 123456
+Enter MFA code for arn:aws:iam::111111111111:mfa/k1low:: 123456
 [...]
 ```
 
@@ -19,8 +19,8 @@ Enter MFA token code: 123456
 When `awsdo` is executed with no arguments, `awsdo` outputs shell script to export AWS credentials environment variables like [`aswrap`](https://github.com/fujiwara/aswrap).
 
 ``` console
-$ export AWS_PROFILE=myaws awsdo
-Enter MFA token code: 123456
+$ AWS_PROFILE=myaws awsdo
+Enter MFA code for arn:aws:iam::111111111111:mfa/k1low:: 123456
 export AWS_REGION=ap-northeast-1
 export AWS_ACCESS_KEY_ID=XXXXXXXXXXXXXXXX
 export AWS_SECRET_ACCESS_KEY=vl/Zv5hGxdy1DPh7IfpYwP/YKU8J6645...
