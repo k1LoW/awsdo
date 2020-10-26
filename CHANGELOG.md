@@ -1,5 +1,9 @@
 # Changelog
 
+## [v0.6.0](https://github.com/k1LoW/awsdo/compare/v0.5.0...v0.6.0) (2020-10-26)
+
+* Add --disable-cache option [#10](https://github.com/k1LoW/awsdo/pull/10) ([k1LoW](https://github.com/k1LoW))
+
 ## [v0.5.0](https://github.com/k1LoW/awsdo/compare/v0.4.0...v0.5.0) (2020-10-25)
 
 * Support external_id [#9](https://github.com/k1LoW/awsdo/pull/9) ([k1LoW](https://github.com/k1LoW))
