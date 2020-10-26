@@ -30,6 +30,7 @@ type Config struct {
 	durationSeconds int64
 	sNum            string
 	tokenCode       string
+	disableCache    bool
 }
 
 type Option func(*Config) error
@@ -72,6 +73,13 @@ func TokenCode(tokenCode string) Option {
 	}
 }
 
+func DisableCache(disableCache bool) Option {
+	return func(c *Config) error {
+		c.disableCache = disableCache
+		return nil
+	}
+}
+
 func Get(ctx context.Context, options ...Option) (*Token, error) {
 	c := &Config{}
 	for _, option := range options {
@@ -85,14 +93,16 @@ func Get(ctx context.Context, options ...Option) (*Token, error) {
 		return nil, err
 	}
 
-	cache, err := getSessionTokenFromCache(c.profile)
-	if err == nil {
-		return &Token{
-			Region:          i.GetKey(c.profile, "region"),
-			AccessKeyId:     *cache.AccessKeyId,
-			SecretAccessKey: *cache.SecretAccessKey,
-			SessionToken:    *cache.SessionToken,
-		}, nil
+	if !c.disableCache {
+		cache, err := getSessionTokenFromCache(c.profile)
+		if err == nil {
+			return &Token{
+				Region:          i.GetKey(c.profile, "region"),
+				AccessKeyId:     *cache.AccessKeyId,
+				SecretAccessKey: *cache.SecretAccessKey,
+				SessionToken:    *cache.SessionToken,
+			}, nil
+		}
 	}
 	var t *Token
 
@@ -148,8 +158,10 @@ func Get(ctx context.Context, options ...Option) (*Token, error) {
 		if err != nil {
 			return t, err
 		}
-		if err := saveSessionTokenAsCache(c.profile, assueRoleOut.Credentials); err != nil {
-			return t, err
+		if !c.disableCache {
+			if err := saveSessionTokenAsCache(c.profile, assueRoleOut.Credentials); err != nil {
+				return t, err
+			}
 		}
 		t = &Token{
 			Region:          i.GetKey(c.profile, "region"),
