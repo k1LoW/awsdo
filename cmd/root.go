@@ -33,10 +33,11 @@ import (
 )
 
 var (
-	profile   string
-	duration  string
-	sNum      string
-	tokenCode string
+	profile      string
+	duration     string
+	sNum         string
+	tokenCode    string
+	disableCache bool
 )
 
 var rootCmd = &cobra.Command{
@@ -52,7 +53,8 @@ var rootCmd = &cobra.Command{
 			token.Profile(profile),
 			token.Duration(duration),
 			token.SerialNumber(sNum),
-			token.TokenCode(tokenCode))
+			token.TokenCode(tokenCode),
+			token.DisableCache(disableCache))
 		if err != nil {
 			cmd.PrintErrln(err)
 			os.Exit(1)
@@ -101,4 +103,5 @@ func init() {
 	rootCmd.Flags().StringVarP(&duration, "duration", "d", "1hour", "the duration that the credentials should remain valid")
 	rootCmd.Flags().StringVarP(&sNum, "serial-number", "n", "", "the identification number of the MFA device")
 	rootCmd.Flags().StringVarP(&tokenCode, "token-code", "c", "", "the value provided by the MFA device")
+	rootCmd.Flags().BoolVarP(&disableCache, "disable-cache", "", false, "disable the credentials cache")
 }
