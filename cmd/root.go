@@ -45,7 +45,7 @@ var rootCmd = &cobra.Command{
 	Short:   "awsdo is a tool to do anything using AWS temporary credentials",
 	Long:    `awsdo is a tool to do anything using AWS temporary credentials.`,
 	Version: version.Version,
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		ctx := context.Background()
 		envs := os.Environ()
 
@@ -56,8 +56,7 @@ var rootCmd = &cobra.Command{
 			token.TokenCode(tokenCode),
 			token.DisableCache(disableCache))
 		if err != nil {
-			cmd.PrintErrln(err)
-			os.Exit(1)
+			return err
 		}
 
 		// no arguments
@@ -68,7 +67,7 @@ var rootCmd = &cobra.Command{
 			cmd.Printf("export AWS_ACCESS_KEY_ID=%s\n", t.AccessKeyId)
 			cmd.Printf("export AWS_SECRET_ACCESS_KEY=%s\n", t.SecretAccessKey)
 			cmd.Printf("export AWS_SESSION_TOKEN=%s\n", t.SessionToken)
-			return
+			return nil
 		}
 
 		if t.Region != "" {
@@ -83,9 +82,9 @@ var rootCmd = &cobra.Command{
 		c.Stderr = os.Stderr
 		c.Env = envs
 		if err := c.Run(); err != nil {
-			cmd.PrintErrln(err)
-			os.Exit(1)
+			return err
 		}
+		return nil
 	},
 }
 
