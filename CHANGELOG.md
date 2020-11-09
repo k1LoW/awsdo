@@ -1,5 +1,8 @@
 # Changelog
 
+## [v0.6.1](https://github.com/k1LoW/awsdo/compare/v0.6.0...v0.6.1) (2020-11-09)
+
+
 ## [v0.6.0](https://github.com/k1LoW/awsdo/compare/v0.5.0...v0.6.0) (2020-10-26)
 
 * Add --disable-cache option [#10](https://github.com/k1LoW/awsdo/pull/10) ([k1LoW](https://github.com/k1LoW))

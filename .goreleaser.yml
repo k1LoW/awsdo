@@ -9,6 +9,8 @@ builds:
     - CGO_ENABLED=0
   goos:
     - linux
+  goarch:
+    - amd64
   ldflags:
     - -s -w -X github.com/k1LoW/awsdo.version={{.Version}} -X github.com/k1LoW/awsdo.commit={{.FullCommit}} -X github.com/k1LoW/awsdo.date={{.Date}} -X github.com/k1LoW/awsdo/version.Version={{.Version}}
 -
@@ -17,6 +19,8 @@ builds:
     - CGO_ENABLED=0
   goos:
     - darwin
+  goarch:
+    - amd64
   ldflags:
     - -s -w -X github.com/k1LoW/awsdo.version={{.Version}} -X github.com/k1LoW/awsdo.commit={{.FullCommit}} -X github.com/k1LoW/awsdo.date={{.Date}} -X github.com/k1LoW/awsdo/version.Version={{.Version}}
 archives:
