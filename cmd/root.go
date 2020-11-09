@@ -41,10 +41,11 @@ var (
 )
 
 var rootCmd = &cobra.Command{
-	Use:     "awsdo",
-	Short:   "awsdo is a tool to do anything using AWS temporary credentials",
-	Long:    `awsdo is a tool to do anything using AWS temporary credentials.`,
-	Version: version.Version,
+	Use:          "awsdo",
+	Short:        "awsdo is a tool to do anything using AWS temporary credentials",
+	Long:         `awsdo is a tool to do anything using AWS temporary credentials.`,
+	Version:      version.Version,
+	SilenceUsage: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		ctx := context.Background()
 		envs := os.Environ()
@@ -92,7 +93,6 @@ func Execute() {
 	rootCmd.SetOut(os.Stdout)
 	rootCmd.SetErr(os.Stderr)
 	if err := rootCmd.Execute(); err != nil {
-		rootCmd.PrintErrln(err)
 		os.Exit(1)
 	}
 }
