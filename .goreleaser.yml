@@ -43,7 +43,7 @@ changelog:
 brews:
 -
   name: awsdo
-  github:
+  tap:
     owner: k1LoW
     name: homebrew-tap
   commit_author:
@@ -51,6 +51,7 @@ brews:
     email: k1lowxb@gmail.com
   homepage: https://github.com/k1LoW/awsdo
   description: awsdo is a tool to do anything using AWS temporary credentials.
+  license: MIT
 nfpms:
   -
     id: awsdo-nfpms
