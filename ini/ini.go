@@ -36,7 +36,11 @@ func New() (*Ini, error) {
 	if err != nil {
 		return nil, err
 	}
-	configIniPath := filepath.Join(home, ".aws", "config")
+
+	configIniPath := os.Getenv("AWS_CONFIG_FILE")
+	if configIniPath == "" {
+		configIniPath = filepath.Join(home, ".aws", "config")
+	}
 	credsIniPath := filepath.Join(home, ".aws", "credentials")
 
 	configIni, err := ini.Load(configIniPath)
