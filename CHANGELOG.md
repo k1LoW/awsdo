@@ -1,5 +1,9 @@
 # Changelog
 
+## [v0.9.0](https://github.com/k1LoW/awsdo/compare/v0.8.2...v0.9.0) (2022-02-02)
+
+* Add option `--login` to login the AWS management console [#16](https://github.com/k1LoW/awsdo/pull/16) ([k1LoW](https://github.com/k1LoW))
+
 ## [v0.8.2](https://github.com/k1LoW/awsdo/compare/v0.8.1...v0.8.2) (2022-02-01)
 
 * Fix typo of cache dir path [#15](https://github.com/k1LoW/awsdo/pull/15) ([k1LoW](https://github.com/k1LoW))
