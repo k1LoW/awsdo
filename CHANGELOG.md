@@ -1,5 +1,9 @@
 # Changelog
 
+## [v0.8.2](https://github.com/k1LoW/awsdo/compare/v0.8.1...v0.8.2) (2022-02-01)
+
+* Fix typo of cache dir path [#15](https://github.com/k1LoW/awsdo/pull/15) ([k1LoW](https://github.com/k1LoW))
+
 ## [v0.8.1](https://github.com/k1LoW/awsdo/compare/v0.8.0...v0.8.1) (2022-02-01)
 
 * Unset default source_profile [#14](https://github.com/k1LoW/awsdo/pull/14) ([k1LoW](https://github.com/k1LoW))
