@@ -90,10 +90,10 @@ $ brew install k1LoW/tap/awsdo
 
 Download binary from [releases page](https://github.com/k1LoW/awsdo/releases)
 
-**go get:**
+**go install:**
 
 ```console
-$ go get github.com/k1LoW/awsdo
+$ go install github.com/k1LoW/awsdo@latest
 ```
 
 ## Reference
