@@ -281,5 +281,5 @@ func dataPath() string {
 		home, _ := os.UserHomeDir()
 		p = filepath.Join(home, ".local", "share")
 	}
-	return filepath.Join(p, "awsgo")
+	return filepath.Join(p, "awsdo")
 }
