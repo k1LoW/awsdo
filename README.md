@@ -71,6 +71,38 @@ $ AWS_PROFILE=myaws awsdo --login
     - `AWS_SESSION_TOKEN`
     - `AWS_REGION`
 
+## Example
+
+### Assume Role on CI
+
+``` yaml
+name: AWS example workflow
+on:
+  push
+permissions:
+  id-token: write
+  contents: read
+jobs:
+  assumeRole:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT }}:role/example-role
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Run as ${{ secrets.AWS_ACCOUNT }}
+        run: |
+          aws sts get-caller-identity
+      - name: Setup awsdo
+        run: |
+          export AWSDO_VERSION=X.X.X
+          curl -L https://git.io/dpkg-i-from-url | bash -s -- https://github.com/k1LoW/awsdo/releases/download/v$AWSDO_VERSION/awsdo_$AWSDO_VERSION-1_amd64.deb
+      - name: Run as ${{ secrets.AWS_ANOTHER_ACCOUNT }} using awsdo
+        run: |
+          awsdo --role-arn=arn:aws:iam::${{ secrets.AWS_ANOTHER_ACCOUNT }}:role/another-example-role -- aws sts get-caller-identity
+```
+
 ## Install
 
 **deb:**
