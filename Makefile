@@ -13,10 +13,10 @@ BUILD_LDFLAGS = -X $(PKG).commit=$(COMMIT) -X $(PKG).date=$(DATE)
 
 default: test
 
-ci: depsdev test sec
+ci: depsdev test
 
 test:
-	go test ./... -coverprofile=coverage.txt -covermode=count
+	go test ./... -coverprofile=coverage.out -covermode=count
 
 sec:
 	gosec ./...
@@ -28,9 +28,9 @@ build:
 	go build -ldflags="$(BUILD_LDFLAGS)"
 
 depsdev:
-	go get github.com/Songmu/ghch/cmd/ghch
-	go get github.com/Songmu/gocredits/cmd/gocredits
-	go get github.com/securego/gosec/cmd/gosec
+	go install github.com/Songmu/ghch/cmd/ghch@v0.10.2
+	go install github.com/Songmu/gocredits/cmd/gocredits@v0.2.0
+	go install github.com/securego/gosec/v2/cmd/gosec@v2.8.1
 
 prerelease:
 	git pull origin main --tag
