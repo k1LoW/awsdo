@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/Songmu/prompter"
@@ -26,6 +27,8 @@ type Token struct {
 
 type Config struct {
 	profile         string
+	roleArn         string
+	sourceProfile   string
 	durationSeconds int64
 	sNum            string
 	tokenCode       string
@@ -43,6 +46,20 @@ func Profile(profile string) Option {
 			profile = "default"
 		}
 		c.profile = profile
+		return nil
+	}
+}
+
+func RoleArn(roleArn string) Option {
+	return func(c *Config) error {
+		c.roleArn = roleArn
+		return nil
+	}
+}
+
+func SourceProfile(sourceProfile string) Option {
+	return func(c *Config) error {
+		c.sourceProfile = sourceProfile
 		return nil
 	}
 }
@@ -92,8 +109,25 @@ func Get(ctx context.Context, options ...Option) (*Token, error) {
 		return nil, err
 	}
 
+	// aws sts assume-role
+	roleArn := c.roleArn
+	if roleArn == "" {
+		roleArn = i.GetKey(c.profile, "role_arn")
+	}
+	sourceProfile := c.sourceProfile
+	if sourceProfile == "" {
+		sourceProfile = i.GetKey(c.profile, "source_profile")
+	}
+	if sourceProfile == "" {
+		sourceProfile = "default"
+	}
+	if c.sNum == "" {
+		c.sNum = i.GetKey(c.profile, "mfa_serial")
+	}
+	key := fmt.Sprintf("%s-%s-%s", c.profile, roleArn, sourceProfile)
+
 	if !c.disableCache {
-		cache, err := getSessionTokenFromCache(c.profile)
+		cache, err := getSessionTokenFromCache(key)
 		if err == nil {
 			return &Token{
 				Region:          i.GetKey(c.profile, "region"),
@@ -104,18 +138,8 @@ func Get(ctx context.Context, options ...Option) (*Token, error) {
 		}
 	}
 	var t *Token
-
-	if c.sNum == "" {
-		c.sNum = i.GetKey(c.profile, "mfa_serial")
-	}
-
 	// aws sts assume-role
-	roleArn := i.GetKey(c.profile, "role_arn")
-	sourceProfile := i.GetKey(c.profile, "source_profile")
 	if roleArn != "" {
-		if sourceProfile == "" {
-			sourceProfile = "default"
-		}
 		sess := session.Must(session.NewSessionWithOptions(session.Options{Profile: sourceProfile}))
 		if c.sNum == "" {
 			iamSvc := iam.New(sess)
@@ -158,7 +182,7 @@ func Get(ctx context.Context, options ...Option) (*Token, error) {
 			return t, err
 		}
 		if !c.disableCache {
-			if err := saveSessionTokenAsCache(c.profile, assueRoleOut.Credentials); err != nil {
+			if err := saveSessionTokenAsCache(key, assueRoleOut.Credentials); err != nil {
 				return t, err
 			}
 		}
@@ -209,7 +233,7 @@ func Get(ctx context.Context, options ...Option) (*Token, error) {
 	if err != nil {
 		return t, err
 	}
-	if err := saveSessionTokenAsCache(c.profile, sessToken.Credentials); err != nil {
+	if err := saveSessionTokenAsCache(key, sessToken.Credentials); err != nil {
 		return t, err
 	}
 	t = &Token{
@@ -221,7 +245,7 @@ func Get(ctx context.Context, options ...Option) (*Token, error) {
 	return t, nil
 }
 
-func saveSessionTokenAsCache(profile string, creds *sts.Credentials) error {
+func saveSessionTokenAsCache(key string, creds *sts.Credentials) error {
 	if _, err := os.Stat(dataPath()); err != nil {
 		if err := os.MkdirAll(dataPath(), 0700); err != nil {
 			return err
@@ -231,12 +255,12 @@ func saveSessionTokenAsCache(profile string, creds *sts.Credentials) error {
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(cachePath(profile), out, 0600)
+	return os.WriteFile(cachePath(key), out, 0600)
 }
 
-func getSessionTokenFromCache(profile string) (*sts.Credentials, error) {
+func getSessionTokenFromCache(key string) (*sts.Credentials, error) {
 	var creds sts.Credentials
-	cache, err := os.ReadFile(cachePath(profile))
+	cache, err := os.ReadFile(cachePath(key))
 	if err != nil {
 		return &creds, err
 	}
@@ -249,8 +273,9 @@ func getSessionTokenFromCache(profile string) (*sts.Credentials, error) {
 	return &creds, nil
 }
 
-func cachePath(profile string) string {
-	return filepath.Join(dataPath(), fmt.Sprintf("%s.json", profile))
+func cachePath(key string) string {
+	r := strings.NewReplacer(":", "_", "/", "_")
+	return filepath.Join(dataPath(), fmt.Sprintf("%s.json", r.Replace(key)))
 }
 
 func dataPath() string {

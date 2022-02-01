@@ -44,11 +44,15 @@ $ eval "$(awsdo --profile myaws --token-code 123456)"
 - Load `~/.aws/credentials` and `~/.aws/config`.
 - Find profile ( section of `AWS_PROFILE` or `--profile` ).
 - Get temporary credentials.
-    1. If the section has `role_arn`, `awsdo` tries to assume role ( `sts:AssumeRole` ).
+    1. If `--role-arn` is set, `awsdo` tries to assume role ( `sts:AssumeRole` ).
+        - `awsdo` tries to get the MFA device serial number ( `iam:ListMFADevices` ).
+        - If `awsdo` get MFA device serial number, it uses multi-factor authentication.
+        - Get temporary credentials.
+    2. If the section has `role_arn`, `awsdo` tries to assume role ( `sts:AssumeRole` ).
         - If the section does not have `mfa_serial`, `awsdo` tries to get the MFA device serial number ( `iam:ListMFADevices` ).
         - If `awsdo` get MFA device serial number, it uses multi-factor authentication.
         - Get temporary credentials.
-    2. Else, `awsdo` try to get session token ( `sts:getSessionToken` ).
+    3. Else, `awsdo` try to get session token ( `sts:getSessionToken` ).
         - If the section does not have `mfa_serial`, `awsdo` tries to get the MFA device serial number ( `iam:ListMFADevices` ).
         - If `awsdo` get MFA device serial number, it uses multi-factor authentication.
         - Get temporary credentials.
