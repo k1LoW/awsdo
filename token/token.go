@@ -118,9 +118,6 @@ func Get(ctx context.Context, options ...Option) (*Token, error) {
 	if sourceProfile == "" {
 		sourceProfile = i.GetKey(c.profile, "source_profile")
 	}
-	if sourceProfile == "" {
-		sourceProfile = "default"
-	}
 	if c.sNum == "" {
 		c.sNum = i.GetKey(c.profile, "mfa_serial")
 	}
