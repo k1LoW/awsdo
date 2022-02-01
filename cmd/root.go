@@ -33,11 +33,13 @@ import (
 )
 
 var (
-	profile      string
-	duration     string
-	sNum         string
-	tokenCode    string
-	disableCache bool
+	profile       string
+	roleArn       string
+	sourceProfile string
+	duration      string
+	sNum          string
+	tokenCode     string
+	disableCache  bool
 )
 
 var rootCmd = &cobra.Command{
@@ -52,6 +54,8 @@ var rootCmd = &cobra.Command{
 
 		t, err := token.Get(ctx,
 			token.Profile(profile),
+			token.RoleArn(roleArn),
+			token.SourceProfile(sourceProfile),
 			token.Duration(duration),
 			token.SerialNumber(sNum),
 			token.TokenCode(tokenCode),
@@ -99,6 +103,8 @@ func Execute() {
 
 func init() {
 	rootCmd.Flags().StringVarP(&profile, "profile", "p", "", "AWS named profile")
+	rootCmd.Flags().StringVarP(&roleArn, "role-arn", "r", "", "IAM Role ARN to be assumed")
+	rootCmd.Flags().StringVarP(&sourceProfile, "source-profile", "s", "", "AWS named profile that assume role")
 	rootCmd.Flags().StringVarP(&duration, "duration", "d", "1hour", "the duration that the credentials should remain valid")
 	rootCmd.Flags().StringVarP(&sNum, "serial-number", "n", "", "the identification number of the MFA device")
 	rootCmd.Flags().StringVarP(&tokenCode, "token-code", "c", "", "the value provided by the MFA device")
