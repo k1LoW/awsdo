@@ -25,7 +25,7 @@ const federationURL = "https://signin.aws.amazon.com/federation"
 const destinationURL = "https://console.aws.amazon.com/"
 
 type Token struct {
-	Region          string `-`
+	Region          string `json:"-"`
 	AccessKeyId     string `json:"sessionId"`
 	SecretAccessKey string `json:"sessionKey"`
 	SessionToken    string `json:"sessionToken"`
