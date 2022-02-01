@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"time"
@@ -232,12 +231,12 @@ func saveSessionTokenAsCache(profile string, creds *sts.Credentials) error {
 	if err != nil {
 		return err
 	}
-	return ioutil.WriteFile(cachePath(profile), out, 0600)
+	return os.WriteFile(cachePath(profile), out, 0600)
 }
 
 func getSessionTokenFromCache(profile string) (*sts.Credentials, error) {
 	var creds sts.Credentials
-	cache, err := ioutil.ReadFile(cachePath(profile))
+	cache, err := os.ReadFile(cachePath(profile))
 	if err != nil {
 		return &creds, err
 	}
