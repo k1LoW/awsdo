@@ -1,5 +1,10 @@
 # Changelog
 
+## [v0.8.0](https://github.com/k1LoW/awsdo/compare/v0.7.0...v0.8.0) (2022-02-01)
+
+* Add option `--role-arn` and `--source-profile` for Assuming Role [#13](https://github.com/k1LoW/awsdo/pull/13) ([k1LoW](https://github.com/k1LoW))
+* Update pkgs [#12](https://github.com/k1LoW/awsdo/pull/12) ([k1LoW](https://github.com/k1LoW))
+
 ## [v0.7.0](https://github.com/k1LoW/awsdo/compare/v0.6.1...v0.7.0) (2021-02-24)
 
 * Add support for the envvars AWS_CONFIG_FILE and AWS_SHARED_CREDENTIALS_FILE [#11](https://github.com/k1LoW/awsdo/pull/11) ([blooper05](https://github.com/blooper05))
