@@ -29,6 +29,8 @@ import (
 
 	"github.com/k1LoW/awsdo/token"
 	"github.com/k1LoW/awsdo/version"
+	"github.com/mattn/go-isatty"
+	"github.com/pkg/browser"
 	"github.com/spf13/cobra"
 )
 
@@ -40,6 +42,7 @@ var (
 	sNum          string
 	tokenCode     string
 	disableCache  bool
+	login         bool
 )
 
 var rootCmd = &cobra.Command{
@@ -66,6 +69,20 @@ var rootCmd = &cobra.Command{
 
 		// no arguments
 		if len(args) == 0 {
+			if login {
+				link, err := t.GenerageLoginLink()
+				if err != nil {
+					return err
+				}
+				if isatty.IsTerminal(os.Stdout.Fd()) {
+					if err := browser.OpenURL(link); err != nil {
+						return err
+					}
+				} else {
+					cmd.Println(link)
+				}
+				return nil
+			}
 			if t.Region != "" {
 				cmd.Printf("export AWS_REGION=%s\n", t.Region)
 			}
@@ -109,4 +126,5 @@ func init() {
 	rootCmd.Flags().StringVarP(&sNum, "serial-number", "n", "", "the identification number of the MFA device")
 	rootCmd.Flags().StringVarP(&tokenCode, "token-code", "c", "", "the value provided by the MFA device")
 	rootCmd.Flags().BoolVarP(&disableCache, "disable-cache", "", false, "disable the credentials cache")
+	rootCmd.Flags().BoolVarP(&login, "login", "", false, "generate login link for the AWS management console")
 }

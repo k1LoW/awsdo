@@ -35,8 +35,9 @@ depsdev:
 prerelease:
 	git pull origin main --tag
 	ghch -w -N ${VER}
-	gocredits . > CREDITS
-	git add CHANGELOG.md CREDITS
+	gocredits -w
+	cat _EXTRA_CREDITS >> CREDITS
+	git add CHANGELOG.md CREDITS go.mod go.sum
 	git commit -m'Bump up version number'
 	git tag ${VER}
 
