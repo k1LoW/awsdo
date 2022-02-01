@@ -33,6 +33,14 @@ If you want to set credentials in a current shell by `eval`, you can use `--toke
 $ eval "$(awsdo --profile myaws --token-code 123456)"
 ```
 
+### As AWS management console login supporter
+
+Login to the AWS management console from a terminal using generaged login link by `awsdo`.
+
+``` console
+$ AWS_PROFILE=myaws awsdo --login
+```
+
 ## Required IAM permissions
 
 - `iam:ListMFADevices`
@@ -99,3 +107,4 @@ $ go install github.com/k1LoW/awsdo@latest
 ## Reference
 
 - [aswrap](https://github.com/fujiwara/aswrap) - AWS assume role credential wrapper.
+- [aws-vault](https://github.com/99designs/aws-vault) - A vault for securely storing and accessing AWS credentials in development environments.

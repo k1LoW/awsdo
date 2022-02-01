@@ -5,6 +5,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
+	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -18,11 +21,57 @@ import (
 	"github.com/k1LoW/duration"
 )
 
+const federationURL = "https://signin.aws.amazon.com/federation"
+const destinationURL = "https://console.aws.amazon.com/"
+
 type Token struct {
-	Region          string
-	AccessKeyId     string
-	SecretAccessKey string
-	SessionToken    string
+	Region          string `json:"-"`
+	AccessKeyId     string `json:"sessionId"`
+	SecretAccessKey string `json:"sessionKey"`
+	SessionToken    string `json:"sessionToken"`
+}
+
+// ref: https://github.com/99designs/aws-vault/blob/39a34315c76ac14143326737fe65def9de2d71ab/cli/login.go#L82
+func (t *Token) GenerageLoginLink() (string, error) {
+	ses, err := json.Marshal(t)
+	if err != nil {
+		return "", err
+	}
+	req, err := http.NewRequest("GET", federationURL, nil)
+	if err != nil {
+		return "", err
+	}
+	q := req.URL.Query()
+	q.Add("Action", "getSigninToken")
+	q.Add("Session", string(ses))
+	req.URL.RawQuery = q.Encode()
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer res.Body.Close()
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		return "", err
+	}
+	if res.StatusCode != http.StatusOK {
+		_, _ = fmt.Fprintf(os.Stderr, "%v\n", body)
+		return "", fmt.Errorf("getSigninToken error: %v", res.Status)
+	}
+
+	var resp map[string]string
+
+	if err := json.Unmarshal([]byte(body), &resp); err != nil {
+		return "", err
+	}
+
+	signinToken, ok := resp["SigninToken"]
+	if !ok {
+		_, _ = fmt.Fprintf(os.Stderr, "%v\n", resp)
+		return "", errors.New("parse error")
+	}
+
+	return fmt.Sprintf("%s?Action=login&Issuer=aws-vault&Destination=%s&SigninToken=%s", federationURL, url.QueryEscape(destinationURL), url.QueryEscape(signinToken)), nil
 }
 
 type Config struct {
