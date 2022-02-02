@@ -241,6 +241,17 @@ func Get(ctx context.Context, options ...Option) (*Token, error) {
 		return t, nil
 	}
 
+	// Use the temporary credentials listed in ~/.aws
+	if i.GetKey(c.profile, "aws_session_token") != "" && i.GetKey(c.profile, "aws_access_key_id") != "" && i.GetKey(c.profile, "aws_secret_access_key") != "" {
+		t = &Token{
+			Region:          i.GetKey(c.profile, "region"),
+			AccessKeyId:     i.GetKey(c.profile, "aws_access_key_id"),
+			SecretAccessKey: i.GetKey(c.profile, "aws_secret_access_key"),
+			SessionToken:    i.GetKey(c.profile, "aws_session_token"),
+		}
+		return t, nil
+	}
+
 	sess := session.Must(session.NewSessionWithOptions(session.Options{Profile: c.profile}))
 	stsSvc := sts.New(sess)
 
