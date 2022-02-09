@@ -1,5 +1,9 @@
 # Changelog
 
+## [v0.9.2](https://github.com/k1LoW/awsdo/compare/v0.9.1...v0.9.2) (2022-02-09)
+
+* Support darwin arm64 [#18](https://github.com/k1LoW/awsdo/pull/18) ([k1LoW](https://github.com/k1LoW))
+
 ## [v0.9.1](https://github.com/k1LoW/awsdo/compare/v0.9.0...v0.9.1) (2022-02-02)
 
 * Use the temporary credentials listed in ~/.aws [#17](https://github.com/k1LoW/awsdo/pull/17) ([k1LoW](https://github.com/k1LoW))
