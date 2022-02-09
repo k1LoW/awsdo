@@ -1,7 +1,7 @@
 linters:
   fast: false
   enable:
-    - gosec  
+    - gosec
 linters-settings:
   staticcheck:
     go: 1.17
