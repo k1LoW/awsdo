@@ -100,7 +100,7 @@ var rootCmd = &cobra.Command{
 		envs = append(envs, fmt.Sprintf("AWS_SESSION_TOKEN=%s", t.SessionToken))
 		command := args[0]
 		c := exec.Command(command, args[1:]...)
-		c.Stdout = os.Stderr
+		c.Stdout = os.Stdout
 		c.Stderr = os.Stderr
 		c.Env = envs
 		if err := c.Run(); err != nil {
