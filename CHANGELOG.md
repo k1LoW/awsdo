@@ -1,5 +1,9 @@
 # Changelog
 
+## [v0.9.3](https://github.com/k1LoW/awsdo/compare/v0.9.2...v0.9.3) (2022-04-13)
+
+* Fix command STDOUT [#19](https://github.com/k1LoW/awsdo/pull/19) ([k1LoW](https://github.com/k1LoW))
+
 ## [v0.9.2](https://github.com/k1LoW/awsdo/compare/v0.9.1...v0.9.2) (2022-02-09)
 
 * Support darwin arm64 [#18](https://github.com/k1LoW/awsdo/pull/18) ([k1LoW](https://github.com/k1LoW))
