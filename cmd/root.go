@@ -103,8 +103,9 @@ var rootCmd = &cobra.Command{
 		c.Stdout = os.Stdout
 		c.Stderr = os.Stderr
 		c.Env = envs
+		cmd.SilenceErrors = true
 		if err := c.Run(); err != nil {
-			return err
+			os.Exit(c.ProcessState.ExitCode())
 		}
 		return nil
 	},
