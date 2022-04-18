@@ -1,5 +1,9 @@
 # Changelog
 
+## [v0.10.0](https://github.com/k1LoW/awsdo/compare/v0.9.3...v0.10.0) (2022-04-18)
+
+* Use the exit code of the execution command as it is. [#20](https://github.com/k1LoW/awsdo/pull/20) ([k1LoW](https://github.com/k1LoW))
+
 ## [v0.9.3](https://github.com/k1LoW/awsdo/compare/v0.9.2...v0.9.3) (2022-04-13)
 
 * Fix command STDOUT [#19](https://github.com/k1LoW/awsdo/pull/19) ([k1LoW](https://github.com/k1LoW))
