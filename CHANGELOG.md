@@ -1,5 +1,10 @@
 # Changelog
 
+## [v0.11.0](https://github.com/k1LoW/awsdo/compare/v0.10.0...v0.11.0) (2022-11-04)
+
+* Bump up go and pkgs version [#22](https://github.com/k1LoW/awsdo/pull/22) ([k1LoW](https://github.com/k1LoW))
+* Update go and pkgs [#21](https://github.com/k1LoW/awsdo/pull/21) ([k1LoW](https://github.com/k1LoW))
+
 ## [v0.10.0](https://github.com/k1LoW/awsdo/compare/v0.9.3...v0.10.0) (2022-04-18)
 
 * Use the exit code of the execution command as it is. [#20](https://github.com/k1LoW/awsdo/pull/20) ([k1LoW](https://github.com/k1LoW))
