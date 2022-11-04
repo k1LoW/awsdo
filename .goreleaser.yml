@@ -11,6 +11,7 @@ builds:
     - linux
   goarch:
     - amd64
+    - arm64
   ldflags:
     - -s -w -X github.com/k1LoW/awsdo.version={{.Version}} -X github.com/k1LoW/awsdo.commit={{.FullCommit}} -X github.com/k1LoW/awsdo.date={{.Date}} -X github.com/k1LoW/awsdo/version.Version={{.Version}}
 -
