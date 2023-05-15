@@ -1,5 +1,9 @@
 # Changelog
 
+## [v0.11.1](https://github.com/k1LoW/awsdo/compare/v0.11.0...v0.11.1) - 2023-05-15
+- Update pkgs by @k1LoW in https://github.com/k1LoW/awsdo/pull/23
+- Setup tagpr by @k1LoW in https://github.com/k1LoW/awsdo/pull/24
+
 ## [v0.11.0](https://github.com/k1LoW/awsdo/compare/v0.10.0...v0.11.0) (2022-11-04)
 
 * Bump up go and pkgs version [#22](https://github.com/k1LoW/awsdo/pull/22) ([k1LoW](https://github.com/k1LoW))
@@ -71,4 +75,3 @@
 * Add options [#1](https://github.com/k1LoW/awsdo/pull/1) ([k1LoW](https://github.com/k1LoW))
 
 ## [v0.1.0](https://github.com/k1LoW/awsdo/compare/697f86a55f7a...v0.1.0) (2020-10-22)
-
