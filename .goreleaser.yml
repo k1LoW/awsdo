@@ -22,18 +22,9 @@ builds:
     - darwin
   goarch:
     - amd64
-  ldflags:
-    - -s -w -X github.com/k1LoW/awsdo.version={{.Version}} -X github.com/k1LoW/awsdo.commit={{.FullCommit}} -X github.com/k1LoW/awsdo.date={{.Date}} -X github.com/k1LoW/awsdo/version.Version={{.Version}}
--
-  id: awsdo-darwin-arm64
-  env:
-    - CGO_ENABLED=0
-  goos:
-    - darwin
-  goarch:
     - arm64
   ldflags:
-    - -s -w -X github.com/k1LoW/awsdo.version={{.Version}} -X github.com/k1LoW/awsdo.commit={{.FullCommit}} -X github.com/k1LoW/awsdo.date={{.Date}} -X github.com/k1LoW/awsdo/version.Version={{.Version}}    
+    - -s -w -X github.com/k1LoW/awsdo.version={{.Version}} -X github.com/k1LoW/awsdo.commit={{.FullCommit}} -X github.com/k1LoW/awsdo.date={{.Date}} -X github.com/k1LoW/awsdo/version.Version={{.Version}}
 archives:
 -
   id: awsdo-archive
@@ -42,27 +33,17 @@ archives:
     - goos: darwin
       format: zip
   files:
+    - LICENSE
     - CREDITS
     - README.md
     - CHANGELOG.md
+  rlcp: true
 checksum:
   name_template: 'checksums.txt'
 snapshot:
   name_template: "{{ .Version }}-next"
 changelog:
   skip: true
-brews:
--
-  name: awsdo
-  tap:
-    owner: k1LoW
-    name: homebrew-tap
-  commit_author:
-    name: k1LoW
-    email: k1lowxb@gmail.com
-  homepage: https://github.com/k1LoW/awsdo
-  description: awsdo is a tool to do anything using AWS temporary credentials.
-  license: MIT
 nfpms:
   -
     id: awsdo-nfpms
