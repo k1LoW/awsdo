@@ -1,5 +1,8 @@
 # Changelog
 
+## [v0.11.2](https://github.com/k1LoW/awsdo/compare/v0.11.1...v0.11.2) - 2023-10-09
+- docs: add the installation guide with aqua by @suzuki-shunsuke in https://github.com/k1LoW/awsdo/pull/27
+
 ## [v0.11.1](https://github.com/k1LoW/awsdo/compare/v0.11.0...v0.11.1) - 2023-05-15
 - Update pkgs by @k1LoW in https://github.com/k1LoW/awsdo/pull/23
 - Setup tagpr by @k1LoW in https://github.com/k1LoW/awsdo/pull/24
