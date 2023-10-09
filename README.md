@@ -126,6 +126,12 @@ $ yum install https://github.com/k1LoW/awsdo/releases/download/v$AWSDO_VERSION/a
 $ brew install k1LoW/tap/awsdo
 ```
 
+**[aqua](https://aquaproj.github.io/):**
+
+```console
+$ aqua g -i k1LoW/awsdo
+```
+
 **manually:**
 
 Download binary from [releases page](https://github.com/k1LoW/awsdo/releases)
