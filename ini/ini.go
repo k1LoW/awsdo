@@ -47,14 +47,20 @@ func New() (*Ini, error) {
 		credsIniPath = filepath.Join(home, ".aws", "credentials")
 	}
 
-	configIni, err := ini.Load(configIniPath)
-	if err != nil {
-		return nil, err
+	configIni := ini.Empty()
+	credsIni := ini.Empty()
+	if fi, err := os.Stat(configIniPath); err == nil && !fi.IsDir() {
+		configIni, err = ini.Load(configIniPath)
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	credsIni, err := ini.Load(credsIniPath)
-	if err != nil {
-		return nil, err
+	if fi, err := os.Stat(credsIniPath); err == nil && !fi.IsDir() {
+		credsIni, err = ini.Load(credsIniPath)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return &Ini{
