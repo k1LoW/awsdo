@@ -1,0 +1,10 @@
+[default]
+region=us-east-1
+output=json
+
+[profile k1low]
+region=ap-northeast-1
+output=json
+role_arn=arn:aws:iam::111111111111:role/admin-access
+mfa_serial=arn:aws:iam::111111111111:mfa/k1low
+source_profile=k1low-credentials
