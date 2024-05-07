@@ -1,5 +1,12 @@
 # Changelog
 
+## [v0.12.0](https://github.com/k1LoW/awsdo/compare/v0.11.1...v0.12.0) - 2024-05-07
+- docs: add the installation guide with aqua by @suzuki-shunsuke in https://github.com/k1LoW/awsdo/pull/27
+- On dependabot by @k1LoW in https://github.com/k1LoW/awsdo/pull/32
+- chore(deps): bump the dependencies group with 2 updates by @dependabot in https://github.com/k1LoW/awsdo/pull/33
+- chore(deps): bump the dependencies group with 3 updates by @dependabot in https://github.com/k1LoW/awsdo/pull/34
+- Allow no ~/.aws/config or ~/.aws/credentials by @k1LoW in https://github.com/k1LoW/awsdo/pull/31
+
 ## [v0.11.1](https://github.com/k1LoW/awsdo/compare/v0.11.0...v0.11.1) - 2023-05-15
 - Update pkgs by @k1LoW in https://github.com/k1LoW/awsdo/pull/23
 - Setup tagpr by @k1LoW in https://github.com/k1LoW/awsdo/pull/24
