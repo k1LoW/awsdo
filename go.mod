@@ -4,11 +4,11 @@ go 1.20
 
 require (
 	github.com/Songmu/prompter v0.5.1
-	github.com/aws/aws-sdk-go v1.44.262
+	github.com/aws/aws-sdk-go v1.52.3
 	github.com/k1LoW/duration v1.2.0
-	github.com/mattn/go-isatty v0.0.18
+	github.com/mattn/go-isatty v0.0.20
 	github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8
-	github.com/spf13/cobra v1.7.0
+	github.com/spf13/cobra v1.8.0
 	gopkg.in/ini.v1 v1.67.0
 )
 
