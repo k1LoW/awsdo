@@ -1,5 +1,10 @@
 # Changelog
 
+## [v0.13.0](https://github.com/k1LoW/awsdo/compare/v0.12.0...v0.13.0) - 2024-05-23
+- chore(deps): bump github.com/aws/aws-sdk-go from 1.52.3 to 1.53.0 in the dependencies group by @dependabot in https://github.com/k1LoW/awsdo/pull/35
+- chore(deps): bump github.com/aws/aws-sdk-go from 1.53.0 to 1.53.5 in the dependencies group by @dependabot in https://github.com/k1LoW/awsdo/pull/37
+- Accept stdin for interactive commands by @k1LoW in https://github.com/k1LoW/awsdo/pull/38
+
 ## [v0.12.0](https://github.com/k1LoW/awsdo/compare/v0.11.1...v0.12.0) - 2024-05-07
 - docs: add the installation guide with aqua by @suzuki-shunsuke in https://github.com/k1LoW/awsdo/pull/27
 - On dependabot by @k1LoW in https://github.com/k1LoW/awsdo/pull/32
