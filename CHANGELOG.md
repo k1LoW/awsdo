@@ -1,5 +1,12 @@
 # Changelog
 
+## [v0.13.1](https://github.com/k1LoW/awsdo/compare/v0.13.0...v0.13.1) - 2024-06-24
+- chore(deps): bump github.com/aws/aws-sdk-go from 1.53.5 to 1.53.10 in the dependencies group by @dependabot in https://github.com/k1LoW/awsdo/pull/39
+- chore(deps): bump github.com/aws/aws-sdk-go from 1.53.10 to 1.53.14 in the dependencies group by @dependabot in https://github.com/k1LoW/awsdo/pull/41
+- chore(deps): bump github.com/aws/aws-sdk-go from 1.53.14 to 1.53.19 in the dependencies group by @dependabot in https://github.com/k1LoW/awsdo/pull/42
+- chore(deps): bump the dependencies group with 2 updates by @dependabot in https://github.com/k1LoW/awsdo/pull/43
+- chore(deps): bump github.com/aws/aws-sdk-go from 1.54.2 to 1.54.6 in the dependencies group by @dependabot in https://github.com/k1LoW/awsdo/pull/44
+
 ## [v0.13.0](https://github.com/k1LoW/awsdo/compare/v0.12.0...v0.13.0) - 2024-05-23
 - chore(deps): bump github.com/aws/aws-sdk-go from 1.52.3 to 1.53.0 in the dependencies group by @dependabot in https://github.com/k1LoW/awsdo/pull/35
 - chore(deps): bump github.com/aws/aws-sdk-go from 1.53.0 to 1.53.5 in the dependencies group by @dependabot in https://github.com/k1LoW/awsdo/pull/37
