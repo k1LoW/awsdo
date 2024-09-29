@@ -27,7 +27,7 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/k1LoW/awsdo/token"
+	"github.com/k1LoW/awsdo/auth"
 	"github.com/k1LoW/awsdo/version"
 	"github.com/mattn/go-isatty"
 	"github.com/pkg/browser"
@@ -55,14 +55,14 @@ var rootCmd = &cobra.Command{
 		ctx := context.Background()
 		envs := os.Environ()
 
-		t, err := token.Get(ctx,
-			token.Profile(profile),
-			token.RoleArn(roleArn),
-			token.SourceProfile(sourceProfile),
-			token.Duration(duration),
-			token.SerialNumber(sNum),
-			token.TokenCode(tokenCode),
-			token.DisableCache(disableCache))
+		t, err := auth.Token(ctx,
+			auth.Profile(profile),
+			auth.RoleArn(roleArn),
+			auth.SourceProfile(sourceProfile),
+			auth.Duration(duration),
+			auth.SerialNumber(sNum),
+			auth.TokenCode(tokenCode),
+			auth.DisableCache(disableCache))
 		if err != nil {
 			return err
 		}

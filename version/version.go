@@ -1,7 +1,7 @@
 package version
 
-// Name for this
+// Name for this.
 const Name string = "awsdo"
 
-// Version for this
+// Version for this.
 var Version = "0.13.0"
