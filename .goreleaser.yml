@@ -1,3 +1,4 @@
+version: 2
 before:
   hooks:
     - go mod download
@@ -37,13 +38,16 @@ archives:
     - CREDITS
     - README.md
     - CHANGELOG.md
-  rlcp: true
 checksum:
   name_template: 'checksums.txt'
 snapshot:
   name_template: "{{ .Version }}-next"
 changelog:
-  skip: true
+  sort: asc
+  filters:
+    exclude:
+    - '^docs:'
+    - '^test:'
 nfpms:
   -
     id: awsdo-nfpms
