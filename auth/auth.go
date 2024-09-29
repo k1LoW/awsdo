@@ -1,4 +1,4 @@
-package token
+package auth
 
 import (
 	"context"
@@ -24,7 +24,7 @@ import (
 const federationURL = "https://signin.aws.amazon.com/federation"
 const destinationURL = "https://console.aws.amazon.com/"
 
-type Token struct {
+type token struct {
 	Region          string `json:"-"`
 	AccessKeyId     string `json:"sessionId"`
 	SecretAccessKey string `json:"sessionKey"`
@@ -32,7 +32,7 @@ type Token struct {
 }
 
 // ref: https://github.com/99designs/aws-vault/blob/39a34315c76ac14143326737fe65def9de2d71ab/cli/login.go#L82
-func (t *Token) GenerageLoginLink() (string, error) {
+func (t *token) GenerageLoginLink() (string, error) {
 	ses, err := json.Marshal(t)
 	if err != nil {
 		return "", err
@@ -145,7 +145,7 @@ func DisableCache(disableCache bool) Option {
 	}
 }
 
-func Get(ctx context.Context, options ...Option) (*Token, error) {
+func Token(ctx context.Context, options ...Option) (*token, error) {
 	c := &Config{}
 	for _, option := range options {
 		if err := option(c); err != nil {
@@ -175,7 +175,7 @@ func Get(ctx context.Context, options ...Option) (*Token, error) {
 	if !c.disableCache {
 		cache, err := getSessionTokenFromCache(key)
 		if err == nil {
-			return &Token{
+			return &token{
 				Region:          i.GetKey(c.profile, "region"),
 				AccessKeyId:     *cache.AccessKeyId,
 				SecretAccessKey: *cache.SecretAccessKey,
@@ -183,7 +183,7 @@ func Get(ctx context.Context, options ...Option) (*Token, error) {
 			}, nil
 		}
 	}
-	var t *Token
+	var t *token
 	// aws sts assume-role
 	if roleArn != "" {
 		sess := session.Must(session.NewSessionWithOptions(session.Options{Profile: sourceProfile}))
@@ -232,7 +232,7 @@ func Get(ctx context.Context, options ...Option) (*Token, error) {
 				return t, err
 			}
 		}
-		t = &Token{
+		t = &token{
 			Region:          i.GetKey(c.profile, "region"),
 			AccessKeyId:     *assueRoleOut.Credentials.AccessKeyId,
 			SecretAccessKey: *assueRoleOut.Credentials.SecretAccessKey,
@@ -243,7 +243,7 @@ func Get(ctx context.Context, options ...Option) (*Token, error) {
 
 	// Use the temporary credentials listed in ~/.aws
 	if i.GetKey(c.profile, "aws_session_token") != "" && i.GetKey(c.profile, "aws_access_key_id") != "" && i.GetKey(c.profile, "aws_secret_access_key") != "" {
-		t = &Token{
+		t = &token{
 			Region:          i.GetKey(c.profile, "region"),
 			AccessKeyId:     i.GetKey(c.profile, "aws_access_key_id"),
 			SecretAccessKey: i.GetKey(c.profile, "aws_secret_access_key"),
@@ -293,7 +293,7 @@ func Get(ctx context.Context, options ...Option) (*Token, error) {
 	if err := saveSessionTokenAsCache(key, sessToken.Credentials); err != nil {
 		return t, err
 	}
-	t = &Token{
+	t = &token{
 		Region:          i.GetKey(c.profile, "region"),
 		AccessKeyId:     *sessToken.Credentials.AccessKeyId,
 		SecretAccessKey: *sessToken.Credentials.SecretAccessKey,
