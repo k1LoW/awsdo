@@ -32,7 +32,7 @@ type token struct {
 }
 
 // ref: https://github.com/99designs/aws-vault/blob/39a34315c76ac14143326737fe65def9de2d71ab/cli/login.go#L82
-func (t *token) GenerageLoginLink() (string, error) {
+func (t *token) GenerateLoginLink() (string, error) {
 	ses, err := json.Marshal(t)
 	if err != nil {
 		return "", err

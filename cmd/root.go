@@ -70,7 +70,7 @@ var rootCmd = &cobra.Command{
 		// no arguments
 		if len(args) == 0 {
 			if login {
-				link, err := t.GenerageLoginLink()
+				link, err := t.GenerateLoginLink()
 				if err != nil {
 					return err
 				}
