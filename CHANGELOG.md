@@ -1,5 +1,8 @@
 # Changelog
 
+## [v1.2.0](https://github.com/k1LoW/awsdo/compare/v1.1.0...v1.2.0) - 2025-03-26
+- feat(auth): add SSO login support by @k1LoW in https://github.com/k1LoW/awsdo/pull/60
+
 ## [v1.1.0](https://github.com/k1LoW/awsdo/compare/v1.0.1...v1.1.0) - 2025-03-26
 - feat: support using sso session by @k1LoW in https://github.com/k1LoW/awsdo/pull/59
 
