@@ -34,6 +34,9 @@ jobs:
 
       - name: Run tests
         run: make ci
+        with:
+          fail_on_error: true
+          go_version_file: go.mod
 
       - name: Run Trivy vulnerability scanner in repo mode
         uses: aquasecurity/trivy-action@master
