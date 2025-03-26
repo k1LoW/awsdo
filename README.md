@@ -4,7 +4,7 @@
 
 ## Usage
 
-`awsdo` does anything with temporary credentials generated using `aws sts get-session-token` and `aws sts assume-role`.
+`awsdo` does anything with temporary credentials generated using the same functions as `aws sts get-session-token`, `aws sts assume-role` and `aws sso login`.
 
 ### As command wrapper
 
