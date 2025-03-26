@@ -150,7 +150,8 @@ Download binary from [releases page](https://github.com/k1LoW/awsdo/releases)
 $ go install github.com/k1LoW/awsdo@latest
 ```
 
-## Reference
+## References
 
 - [aswrap](https://github.com/fujiwara/aswrap) - AWS assume role credential wrapper.
 - [aws-vault](https://github.com/99designs/aws-vault) - A vault for securely storing and accessing AWS credentials in development environments.
+- [aws-sso-go](https://github.com/mrtc0/aws-sso-go) - A utility tool that allows credentials to be saved in 1Password even in an AWS SSO environment.
