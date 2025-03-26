@@ -51,20 +51,28 @@ $ AWS_PROFILE=myaws awsdo --login
 
 - Load `~/.aws/credentials` and `~/.aws/config`.
 - Get temporary credentials.
-    1. If `--role-arn` is set, `awsdo` tries to assume role ( `sts:AssumeRole` ).
+    1. If the section has `aws_session_token`, `awsdo` use that.
+        - Find profile ( section of `AWS_PROFILE` or `--profile` ).
+        - **Get temporary credentials :key:**.
+    2. If `--role-arn` is set, `awsdo` tries to assume role ( `sts:AssumeRole` ).
+        - Find profile ( section of `AWS_PROFILE` or `--profile` ).
         - `awsdo` tries to get the MFA device serial number ( `iam:ListMFADevices` ).
         - If `awsdo` get MFA device serial number, it uses multi-factor authentication.
-        - Get temporary credentials.
-    2. If the section has `role_arn`, `awsdo` tries to assume role ( `sts:AssumeRole` ).
+        - **Get temporary credentials :key:**.
+    3. If the section has `role_arn`, `awsdo` tries to assume role ( `sts:AssumeRole` ).
         - Find profile ( section of `AWS_PROFILE` or `--profile` ).
         - If the section does not have `mfa_serial`, `awsdo` tries to get the MFA device serial number ( `iam:ListMFADevices` ).
         - If `awsdo` get MFA device serial number, it uses multi-factor authentication.
-        - Get temporary credentials.
-    3. Else, `awsdo` try to get session token ( `sts:getSessionToken` ).
+        - **Get temporary credentials :key:**.
+    4. If the section has `sso_session`, `awsdo` tries to SSO login.
+        - Find profile ( section of `AWS_PROFILE` or `--profile` ).
+        - `awsdo` tries to SSO login like `aws sso login`.
+        - **Get temporary credentials :key:**.
+    5. Else, `awsdo` try to get session token ( `sts:getSessionToken` ).
         - Find profile ( section of `AWS_PROFILE` or `--profile` ).
         - If the section does not have `mfa_serial`, `awsdo` tries to get the MFA device serial number ( `iam:ListMFADevices` ).
         - If `awsdo` get MFA device serial number, it uses multi-factor authentication.
-        - Get temporary credentials.
+        - **Get temporary credentials :key:**.
 - Set the temporary credentials to environment variables and execute command or export environment variables.
     - `AWS_ACCESS_KEY_ID`
     - `AWS_SECRET_ACCESS_KEY`

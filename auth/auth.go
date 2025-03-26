@@ -194,6 +194,18 @@ func Token(ctx context.Context, options ...Option) (*token, error) {
 		}
 	}
 	var t *token
+
+	// Use the temporary credentials listed in ~/.aws
+	if i.GetKey(c.profile, "aws_session_token") != "" && i.GetKey(c.profile, "aws_access_key_id") != "" && i.GetKey(c.profile, "aws_secret_access_key") != "" {
+		t = &token{
+			Region:          i.GetKey(c.profile, "region"),
+			AccessKeyId:     i.GetKey(c.profile, "aws_access_key_id"),
+			SecretAccessKey: i.GetKey(c.profile, "aws_secret_access_key"),
+			SessionToken:    i.GetKey(c.profile, "aws_session_token"),
+		}
+		return t, nil
+	}
+
 	// aws sts assume-role
 	if roleArn != "" {
 		sess := session.Must(session.NewSessionWithOptions(session.Options{
@@ -251,17 +263,6 @@ func Token(ctx context.Context, options ...Option) (*token, error) {
 			AccessKeyId:     *assueRoleOut.Credentials.AccessKeyId,
 			SecretAccessKey: *assueRoleOut.Credentials.SecretAccessKey,
 			SessionToken:    *assueRoleOut.Credentials.SessionToken,
-		}
-		return t, nil
-	}
-
-	// Use the temporary credentials listed in ~/.aws
-	if i.GetKey(c.profile, "aws_session_token") != "" && i.GetKey(c.profile, "aws_access_key_id") != "" && i.GetKey(c.profile, "aws_secret_access_key") != "" {
-		t = &token{
-			Region:          i.GetKey(c.profile, "region"),
-			AccessKeyId:     i.GetKey(c.profile, "aws_access_key_id"),
-			SecretAccessKey: i.GetKey(c.profile, "aws_secret_access_key"),
-			SessionToken:    i.GetKey(c.profile, "aws_session_token"),
 		}
 		return t, nil
 	}
