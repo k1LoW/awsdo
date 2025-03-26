@@ -14,15 +14,25 @@ import (
 	"time"
 
 	"github.com/Songmu/prompter"
+	awsv2 "github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/credentials/ssocreds"
+	"github.com/aws/aws-sdk-go-v2/service/sso"
+	"github.com/aws/aws-sdk-go-v2/service/ssooidc"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/iam"
 	"github.com/aws/aws-sdk-go/service/sts"
 	"github.com/k1LoW/awsdo/ini"
 	"github.com/k1LoW/duration"
+	"github.com/pkg/browser"
 )
 
 const federationURL = "https://signin.aws.amazon.com/federation"
 const destinationURL = "https://console.aws.amazon.com/"
+const clientName = "awsdo"
+const clientType = "public"
+const scope = "sso-portal:*"
+const grantType = "urn:ietf:params:oauth:grant-type:device_code"
 
 type token struct {
 	Region          string `json:"-"`
@@ -262,19 +272,19 @@ func Token(ctx context.Context, options ...Option) (*token, error) {
 	}))
 
 	// sso login
-	ssoSession := i.GetKey(c.profile, "sso_session")
-	if ssoSession != "" {
-		v, err := sess.Config.Credentials.GetWithContext(ctx)
-		if err != nil {
-			return nil, err
+	if i.Has(c.profile, "sso_session") {
+		if !c.disableCache {
+			if v, err := sess.Config.Credentials.GetWithContext(ctx); err == nil {
+				t = &token{
+					Region:          i.GetKey(c.profile, "region"),
+					AccessKeyId:     v.AccessKeyID,
+					SecretAccessKey: v.SecretAccessKey,
+					SessionToken:    v.SessionToken,
+				}
+				return t, nil
+			}
 		}
-		t = &token{
-			Region:          i.GetKey(c.profile, "region"),
-			AccessKeyId:     v.AccessKeyID,
-			SecretAccessKey: v.SecretAccessKey,
-			SessionToken:    v.SessionToken,
-		}
-		return t, nil
+		return ssoLogin(ctx, c.profile, i, c.disableCache)
 	}
 
 	stsSvc := sts.New(sess)
@@ -324,6 +334,117 @@ func Token(ctx context.Context, options ...Option) (*token, error) {
 		SessionToken:    *sessToken.Credentials.SessionToken,
 	}
 	return t, nil
+}
+
+type cacheData struct {
+	StartUrl              string    `json:"startUrl"`
+	Region                string    `json:"region"`
+	AccessToken           string    `json:"accessToken"`
+	ExpiresAt             time.Time `json:"expiresAt"`
+	ClientId              string    `json:"clientId"`
+	ClientSecret          string    `json:"clientSecret"`
+	RegistrationExpiresAt time.Time `json:"registrationExpiresAt"`
+}
+
+func ssoLogin(ctx context.Context, profile string, i *ini.Ini, disableCache bool) (*token, error) {
+	if !i.Has(profile, "sso_session", "sso_start_url", "sso_account_id", "sso_role_name", "sso_region", "sso_registration_scopes", "region") {
+		return nil, fmt.Errorf("invalid profile: %s", profile)
+	}
+
+	cfg, err := config.LoadDefaultConfig(ctx, config.WithSharedConfigProfile(profile))
+	if err != nil {
+		return nil, err
+	}
+	cfg.Region = i.GetKey(profile, "sso_region")
+
+	ssooidcClient := ssooidc.NewFromConfig(cfg)
+	register, err := ssooidcClient.RegisterClient(ctx, &ssooidc.RegisterClientInput{
+		ClientName: awsv2.String(clientName),
+		ClientType: awsv2.String(clientType),
+		Scopes:     []string{i.GetKey(profile, "sso_registration_scopes")},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	deviceAuth, err := ssooidcClient.StartDeviceAuthorization(ctx, &ssooidc.StartDeviceAuthorizationInput{
+		ClientId:     register.ClientId,
+		ClientSecret: register.ClientSecret,
+		StartUrl:     awsv2.String(i.GetKey(profile, "sso_start_url")),
+	})
+	if err != nil {
+		return nil, err
+	}
+	url := awsv2.ToString(deviceAuth.VerificationUriComplete)
+	if err := browser.OpenURL(url); err != nil {
+		return nil, err
+	}
+	_, _ = fmt.Fprintf(os.Stderr, "User Code: %s\n", awsv2.ToString(deviceAuth.UserCode))
+
+	var ssotoken *ssooidc.CreateTokenOutput
+	for {
+		ssotoken, err = ssooidcClient.CreateToken(context.TODO(), &ssooidc.CreateTokenInput{
+			ClientId:     register.ClientId,
+			ClientSecret: register.ClientSecret,
+			DeviceCode:   deviceAuth.DeviceCode,
+			GrantType:    awsv2.String(grantType),
+		})
+		if err == nil {
+			break
+		}
+		if !strings.Contains(err.Error(), "AuthorizationPendingException") {
+			return nil, err
+		}
+		time.Sleep(2 * time.Second)
+	}
+	if ssotoken == nil {
+		return nil, errors.New("login failed")
+	}
+
+	ssoClient := sso.NewFromConfig(cfg)
+
+	creds, err := ssoClient.GetRoleCredentials(ctx, &sso.GetRoleCredentialsInput{
+		AccessToken: ssotoken.AccessToken,
+		AccountId:   awsv2.String(i.GetKey(profile, "sso_account_id")),
+		RoleName:    awsv2.String(i.GetKey(profile, "sso_role_name")),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	if !disableCache {
+		cachePath, err := ssocreds.StandardCachedTokenFilepath(i.GetKey(profile, "sso_session"))
+		if err != nil {
+			return nil, err
+		}
+		d := cacheData{
+			StartUrl:              i.GetKey(profile, "sso_start_url"),
+			Region:                i.GetKey(profile, "region"),
+			AccessToken:           *ssotoken.AccessToken,
+			ExpiresAt:             time.Unix(time.Now().Unix()+int64(ssotoken.ExpiresIn), 0).UTC(),
+			ClientId:              *register.ClientId,
+			ClientSecret:          *register.ClientSecret,
+			RegistrationExpiresAt: time.Unix(register.ClientSecretExpiresAt, 0).UTC(),
+		}
+		b, err := json.Marshal(d)
+		if err != nil {
+			return nil, err
+		}
+		dir := filepath.Dir(cachePath)
+		if err := os.MkdirAll(dir, 0700); err != nil {
+			return nil, err
+		}
+		if err := os.WriteFile(cachePath, b, 0600); err != nil {
+			return nil, err
+		}
+	}
+
+	return &token{
+		Region:          i.GetKey(profile, "region"),
+		AccessKeyId:     *creds.RoleCredentials.AccessKeyId,
+		SecretAccessKey: *creds.RoleCredentials.SecretAccessKey,
+		SessionToken:    *creds.RoleCredentials.SessionToken,
+	}, nil
 }
 
 func saveSessionTokenAsCache(key string, creds *sts.Credentials) error {
