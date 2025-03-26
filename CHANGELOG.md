@@ -1,5 +1,8 @@
 # Changelog
 
+## [v1.1.0](https://github.com/k1LoW/awsdo/compare/v1.0.1...v1.1.0) - 2025-03-26
+- feat: support using sso session by @k1LoW in https://github.com/k1LoW/awsdo/pull/59
+
 ## [v1.0.1](https://github.com/k1LoW/awsdo/compare/v1.0.0...v1.0.1) - 2025-03-26
 - chore(deps): bump the dependencies group across 1 directory with 2 updates by @dependabot in https://github.com/k1LoW/awsdo/pull/55
 
