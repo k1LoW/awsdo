@@ -190,6 +190,7 @@ func Token(ctx context.Context, options ...Option) (*token, error) {
 			SharedConfigState: session.SharedConfigEnable,
 			Profile:           sourceProfile,
 		}))
+
 		if c.sNum == "" {
 			iamSvc := iam.New(sess)
 			devs, _ := iamSvc.ListMFADevicesWithContext(ctx, &iam.ListMFADevicesInput{})
@@ -259,6 +260,23 @@ func Token(ctx context.Context, options ...Option) (*token, error) {
 		SharedConfigState: session.SharedConfigEnable,
 		Profile:           c.profile,
 	}))
+
+	// sso login
+	ssoSession := i.GetKey(c.profile, "sso_session")
+	if ssoSession != "" {
+		v, err := sess.Config.Credentials.GetWithContext(ctx)
+		if err != nil {
+			return nil, err
+		}
+		t = &token{
+			Region:          i.GetKey(c.profile, "region"),
+			AccessKeyId:     v.AccessKeyID,
+			SecretAccessKey: v.SecretAccessKey,
+			SessionToken:    v.SessionToken,
+		}
+		return t, nil
+	}
+
 	stsSvc := sts.New(sess)
 
 	if c.sNum == "" {
