@@ -12,6 +12,9 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - name: Check out source code
         uses: actions/checkout@v4
@@ -25,6 +28,9 @@ jobs:
 
       - name: Run lint
         uses: reviewdog/action-golangci-lint@v2
+        with:
+          fail_on_error: true
+          go_version_file: go.mod
 
       - name: Run tests
         run: make ci
