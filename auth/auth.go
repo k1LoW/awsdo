@@ -348,7 +348,36 @@ type cacheData struct {
 }
 
 func ssoLogin(ctx context.Context, profile string, i *ini.Ini, disableCache bool) (*token, error) {
-	if !i.Has(profile, "sso_session", "sso_start_url", "sso_account_id", "sso_role_name", "sso_region", "sso_registration_scopes", "region") {
+	if !i.Has(profile, "sso_session", "sso_account_id", "sso_role_name", "region") {
+		return nil, fmt.Errorf("invalid profile: %s", profile)
+	}
+	var ssoStartURL, ssoRegion, ssoRegistrationScopes string
+
+	ssoSession := i.GetKey(profile, "sso_session")
+	if i.Has(profile, "sso_start_url") {
+		ssoStartURL = i.GetKey(profile, "sso_start_url")
+	} else {
+		ssoStartURL = i.GetKey(fmt.Sprintf("sso-session %s", ssoSession), "sso_start_url")
+	}
+	if ssoStartURL == "" {
+		return nil, fmt.Errorf("invalid profile: %s", profile)
+	}
+
+	if i.Has(profile, "sso_region") {
+		ssoRegion = i.GetKey(profile, "sso_region")
+	} else {
+		ssoRegion = i.GetKey(fmt.Sprintf("sso-session %s", ssoSession), "sso_region")
+	}
+	if ssoRegion == "" {
+		return nil, fmt.Errorf("invalid profile: %s", profile)
+	}
+
+	if i.Has(profile, "sso_registration_scopes") {
+		ssoRegistrationScopes = i.GetKey(profile, "sso_registration_scopes")
+	} else {
+		ssoRegistrationScopes = i.GetKey(fmt.Sprintf("sso-session %s", ssoSession), "sso_registration_scopes")
+	}
+	if ssoRegistrationScopes == "" {
 		return nil, fmt.Errorf("invalid profile: %s", profile)
 	}
 
@@ -356,13 +385,13 @@ func ssoLogin(ctx context.Context, profile string, i *ini.Ini, disableCache bool
 	if err != nil {
 		return nil, err
 	}
-	cfg.Region = i.GetKey(profile, "sso_region")
+	cfg.Region = ssoRegion
 
 	ssooidcClient := ssooidc.NewFromConfig(cfg)
 	register, err := ssooidcClient.RegisterClient(ctx, &ssooidc.RegisterClientInput{
 		ClientName: awsv2.String(clientName),
 		ClientType: awsv2.String(clientType),
-		Scopes:     []string{i.GetKey(profile, "sso_registration_scopes")},
+		Scopes:     []string{ssoRegistrationScopes},
 	})
 	if err != nil {
 		return nil, err
@@ -371,7 +400,7 @@ func ssoLogin(ctx context.Context, profile string, i *ini.Ini, disableCache bool
 	deviceAuth, err := ssooidcClient.StartDeviceAuthorization(ctx, &ssooidc.StartDeviceAuthorizationInput{
 		ClientId:     register.ClientId,
 		ClientSecret: register.ClientSecret,
-		StartUrl:     awsv2.String(i.GetKey(profile, "sso_start_url")),
+		StartUrl:     awsv2.String(ssoStartURL),
 	})
 	if err != nil {
 		return nil, err
@@ -414,12 +443,12 @@ func ssoLogin(ctx context.Context, profile string, i *ini.Ini, disableCache bool
 	}
 
 	if !disableCache {
-		cachePath, err := ssocreds.StandardCachedTokenFilepath(i.GetKey(profile, "sso_session"))
+		cachePath, err := ssocreds.StandardCachedTokenFilepath(ssoSession)
 		if err != nil {
 			return nil, err
 		}
 		d := cacheData{
-			StartUrl:              i.GetKey(profile, "sso_start_url"),
+			StartUrl:              ssoStartURL,
 			Region:                i.GetKey(profile, "region"),
 			AccessToken:           *ssotoken.AccessToken,
 			ExpiresAt:             time.Unix(time.Now().Unix()+int64(ssotoken.ExpiresIn), 0).UTC(),

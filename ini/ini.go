@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"gopkg.in/ini.v1"
 )
@@ -24,8 +23,6 @@ func (i *Ini) GetKey(profile, key string) string {
 		return i.configIni.Section(profile).Key(key).String()
 	case i.configIni.Section(fmt.Sprintf("profile %s", profile)).Key(key).String() != "":
 		return i.configIni.Section(fmt.Sprintf("profile %s", profile)).Key(key).String()
-	case strings.HasPrefix(key, "sso_") && i.configIni.Section(fmt.Sprintf("sso-session %s", profile)).Key(key).String() != "":
-		return i.configIni.Section(fmt.Sprintf("sso-session %s", profile)).Key(key).String()
 	case i.credsIni.Section("default").Key(key).String() != "":
 		return i.credsIni.Section("default").Key(key).String()
 	case i.configIni.Section("default").Key(key).String() != "":
