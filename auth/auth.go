@@ -186,7 +186,10 @@ func Token(ctx context.Context, options ...Option) (*token, error) {
 	var t *token
 	// aws sts assume-role
 	if roleArn != "" {
-		sess := session.Must(session.NewSessionWithOptions(session.Options{Profile: sourceProfile}))
+		sess := session.Must(session.NewSessionWithOptions(session.Options{
+			SharedConfigState: session.SharedConfigEnable,
+			Profile:           sourceProfile,
+		}))
 		if c.sNum == "" {
 			iamSvc := iam.New(sess)
 			devs, _ := iamSvc.ListMFADevicesWithContext(ctx, &iam.ListMFADevicesInput{})
@@ -252,7 +255,10 @@ func Token(ctx context.Context, options ...Option) (*token, error) {
 		return t, nil
 	}
 
-	sess := session.Must(session.NewSessionWithOptions(session.Options{Profile: c.profile}))
+	sess := session.Must(session.NewSessionWithOptions(session.Options{
+		SharedConfigState: session.SharedConfigEnable,
+		Profile:           c.profile,
+	}))
 	stsSvc := sts.New(sess)
 
 	if c.sNum == "" {
