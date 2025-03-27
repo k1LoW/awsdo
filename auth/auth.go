@@ -14,14 +14,14 @@ import (
 	"time"
 
 	"github.com/Songmu/prompter"
-	awsv2 "github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials/ssocreds"
+	"github.com/aws/aws-sdk-go-v2/service/iam"
 	"github.com/aws/aws-sdk-go-v2/service/sso"
 	"github.com/aws/aws-sdk-go-v2/service/ssooidc"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/iam"
-	"github.com/aws/aws-sdk-go/service/sts"
+	"github.com/aws/aws-sdk-go-v2/service/sts"
+	"github.com/aws/aws-sdk-go-v2/service/sts/types"
 	"github.com/k1LoW/awsdo/ini"
 	"github.com/k1LoW/duration"
 	"github.com/pkg/browser"
@@ -31,12 +31,11 @@ const federationURL = "https://signin.aws.amazon.com/federation"
 const destinationURL = "https://console.aws.amazon.com/"
 const clientName = "awsdo"
 const clientType = "public"
-const scope = "sso-portal:*"
 const grantType = "urn:ietf:params:oauth:grant-type:device_code"
 
 type token struct {
 	Region          string `json:"-"`
-	AccessKeyId     string `json:"sessionId"`
+	AccessKeyID     string `json:"sessionId"`
 	SecretAccessKey string `json:"sessionKey"`
 	SessionToken    string `json:"sessionToken"`
 }
@@ -155,6 +154,8 @@ func DisableCache(disableCache bool) Option {
 	}
 }
 
+// Token returns temporary credentials.
+// nolint:revive // unexported-return is acceptable for this API
 func Token(ctx context.Context, options ...Option) (*token, error) {
 	c := &Config{}
 	for _, option := range options {
@@ -187,7 +188,7 @@ func Token(ctx context.Context, options ...Option) (*token, error) {
 		if err == nil {
 			return &token{
 				Region:          i.GetKey(c.profile, "region"),
-				AccessKeyId:     *cache.AccessKeyId,
+				AccessKeyID:     *cache.AccessKeyId,
 				SecretAccessKey: *cache.SecretAccessKey,
 				SessionToken:    *cache.SessionToken,
 			}, nil
@@ -199,7 +200,7 @@ func Token(ctx context.Context, options ...Option) (*token, error) {
 	if i.GetKey(c.profile, "aws_session_token") != "" && i.GetKey(c.profile, "aws_access_key_id") != "" && i.GetKey(c.profile, "aws_secret_access_key") != "" {
 		t = &token{
 			Region:          i.GetKey(c.profile, "region"),
-			AccessKeyId:     i.GetKey(c.profile, "aws_access_key_id"),
+			AccessKeyID:     i.GetKey(c.profile, "aws_access_key_id"),
 			SecretAccessKey: i.GetKey(c.profile, "aws_secret_access_key"),
 			SessionToken:    i.GetKey(c.profile, "aws_session_token"),
 		}
@@ -208,14 +209,14 @@ func Token(ctx context.Context, options ...Option) (*token, error) {
 
 	// aws sts assume-role
 	if roleArn != "" {
-		sess := session.Must(session.NewSessionWithOptions(session.Options{
-			SharedConfigState: session.SharedConfigEnable,
-			Profile:           sourceProfile,
-		}))
+		cfg, err := config.LoadDefaultConfig(ctx, config.WithSharedConfigProfile(sourceProfile))
+		if err != nil {
+			return t, err
+		}
 
 		if c.sNum == "" {
-			iamSvc := iam.New(sess)
-			devs, _ := iamSvc.ListMFADevicesWithContext(ctx, &iam.ListMFADevicesInput{})
+			iamSvc := iam.NewFromConfig(cfg)
+			devs, _ := iamSvc.ListMFADevices(ctx, &iam.ListMFADevicesInput{})
 			switch {
 			case devs == nil:
 				break
@@ -229,27 +230,30 @@ func Token(ctx context.Context, options ...Option) (*token, error) {
 				c.sNum = *devs.MFADevices[0].SerialNumber
 			}
 		}
-		stsSvc := sts.New(sess)
+		stsSvc := sts.NewFromConfig(cfg)
 		if c.sNum != "" {
 			if c.tokenCode == "" {
 				c.tokenCode = prompter.Prompt(fmt.Sprintf("Enter MFA code for %s", c.sNum), "")
 			}
 		}
 		sessName := fmt.Sprintf("awsdo-session-%d", time.Now().Unix())
+		// Ensure durationSeconds is within int32 range to prevent overflow
+		// #nosec G115 - We've already checked for overflow above
+		durationSeconds := int32(c.durationSeconds)
 		opt := &sts.AssumeRoleInput{
 			RoleSessionName: &sessName,
-			DurationSeconds: &c.durationSeconds,
+			DurationSeconds: &durationSeconds,
 			RoleArn:         &roleArn,
 		}
-		externalId := i.GetKey(c.profile, "external_id")
-		if externalId != "" {
-			opt.ExternalId = &externalId
+		externalID := i.GetKey(c.profile, "external_id")
+		if externalID != "" {
+			opt.ExternalId = &externalID
 		}
 		if c.sNum != "" {
 			opt.SerialNumber = &c.sNum
 			opt.TokenCode = &c.tokenCode
 		}
-		assueRoleOut, err := stsSvc.AssumeRoleWithContext(ctx, opt)
+		assueRoleOut, err := stsSvc.AssumeRole(ctx, opt)
 		if err != nil {
 			return t, err
 		}
@@ -260,27 +264,29 @@ func Token(ctx context.Context, options ...Option) (*token, error) {
 		}
 		t = &token{
 			Region:          i.GetKey(c.profile, "region"),
-			AccessKeyId:     *assueRoleOut.Credentials.AccessKeyId,
+			AccessKeyID:     *assueRoleOut.Credentials.AccessKeyId,
 			SecretAccessKey: *assueRoleOut.Credentials.SecretAccessKey,
 			SessionToken:    *assueRoleOut.Credentials.SessionToken,
 		}
 		return t, nil
 	}
 
-	sess := session.Must(session.NewSessionWithOptions(session.Options{
-		SharedConfigState: session.SharedConfigEnable,
-		Profile:           c.profile,
-	}))
+	cfg, err := config.LoadDefaultConfig(ctx, config.WithSharedConfigProfile(c.profile))
+	if err != nil {
+		return t, err
+	}
 
 	// sso login
 	if i.Has(c.profile, "sso_session") {
 		if !c.disableCache {
-			if v, err := sess.Config.Credentials.GetWithContext(ctx); err == nil {
+			// Try to get credentials from cache
+			creds, err := cfg.Credentials.Retrieve(ctx)
+			if err == nil {
 				t = &token{
 					Region:          i.GetKey(c.profile, "region"),
-					AccessKeyId:     v.AccessKeyID,
-					SecretAccessKey: v.SecretAccessKey,
-					SessionToken:    v.SessionToken,
+					AccessKeyID:     creds.AccessKeyID,
+					SecretAccessKey: creds.SecretAccessKey,
+					SessionToken:    creds.SessionToken,
 				}
 				return t, nil
 			}
@@ -288,11 +294,11 @@ func Token(ctx context.Context, options ...Option) (*token, error) {
 		return ssoLogin(ctx, c.profile, i, c.disableCache)
 	}
 
-	stsSvc := sts.New(sess)
+	stsSvc := sts.NewFromConfig(cfg)
 
 	if c.sNum == "" {
-		iamSvc := iam.New(sess)
-		devs, _ := iamSvc.ListMFADevicesWithContext(ctx, &iam.ListMFADevicesInput{})
+		iamSvc := iam.NewFromConfig(cfg)
+		devs, _ := iamSvc.ListMFADevices(ctx, &iam.ListMFADevicesInput{})
 		switch {
 		case devs == nil:
 			break
@@ -314,14 +320,17 @@ func Token(ctx context.Context, options ...Option) (*token, error) {
 	}
 
 	// aws sts get-session-token
+	// Ensure durationSeconds is within int32 range to prevent overflow
+	// #nosec G115 - We've already checked for overflow above
+	durationSeconds := int32(c.durationSeconds)
 	opt := &sts.GetSessionTokenInput{
-		DurationSeconds: &c.durationSeconds,
+		DurationSeconds: &durationSeconds,
 	}
 	if c.sNum != "" {
 		opt.SerialNumber = &c.sNum
 		opt.TokenCode = &c.tokenCode
 	}
-	sessToken, err := stsSvc.GetSessionTokenWithContext(ctx, opt)
+	sessToken, err := stsSvc.GetSessionToken(ctx, opt)
 	if err != nil {
 		return t, err
 	}
@@ -330,19 +339,26 @@ func Token(ctx context.Context, options ...Option) (*token, error) {
 	}
 	t = &token{
 		Region:          i.GetKey(c.profile, "region"),
-		AccessKeyId:     *sessToken.Credentials.AccessKeyId,
+		AccessKeyID:     *sessToken.Credentials.AccessKeyId,
 		SecretAccessKey: *sessToken.Credentials.SecretAccessKey,
 		SessionToken:    *sessToken.Credentials.SessionToken,
 	}
 	return t, nil
 }
 
+type Credentials struct {
+	AccessKeyID     *string    `json:"AccessKeyId"`
+	SecretAccessKey *string    `json:"SecretAccessKey"`
+	SessionToken    *string    `json:"SessionToken"`
+	Expiration      *time.Time `json:"Expiration"`
+}
+
 type cacheData struct {
-	StartUrl              string    `json:"startUrl"`
+	StartURL              string    `json:"startUrl"`
 	Region                string    `json:"region"`
 	AccessToken           string    `json:"accessToken"`
 	ExpiresAt             time.Time `json:"expiresAt"`
-	ClientId              string    `json:"clientId"`
+	ClientID              string    `json:"clientId"`
 	ClientSecret          string    `json:"clientSecret"`
 	RegistrationExpiresAt time.Time `json:"registrationExpiresAt"`
 }
@@ -389,8 +405,8 @@ func ssoLogin(ctx context.Context, profile string, i *ini.Ini, disableCache bool
 
 	ssooidcClient := ssooidc.NewFromConfig(cfg)
 	register, err := ssooidcClient.RegisterClient(ctx, &ssooidc.RegisterClientInput{
-		ClientName: awsv2.String(clientName),
-		ClientType: awsv2.String(clientType),
+		ClientName: aws.String(clientName),
+		ClientType: aws.String(clientType),
 		Scopes:     []string{ssoRegistrationScopes},
 	})
 	if err != nil {
@@ -400,16 +416,16 @@ func ssoLogin(ctx context.Context, profile string, i *ini.Ini, disableCache bool
 	deviceAuth, err := ssooidcClient.StartDeviceAuthorization(ctx, &ssooidc.StartDeviceAuthorizationInput{
 		ClientId:     register.ClientId,
 		ClientSecret: register.ClientSecret,
-		StartUrl:     awsv2.String(ssoStartURL),
+		StartUrl:     aws.String(ssoStartURL),
 	})
 	if err != nil {
 		return nil, err
 	}
-	url := awsv2.ToString(deviceAuth.VerificationUriComplete)
+	url := aws.ToString(deviceAuth.VerificationUriComplete)
 	if err := browser.OpenURL(url); err != nil {
 		return nil, err
 	}
-	_, _ = fmt.Fprintf(os.Stderr, "User Code: %s\n", awsv2.ToString(deviceAuth.UserCode))
+	_, _ = fmt.Fprintf(os.Stderr, "User Code: %s\n", aws.ToString(deviceAuth.UserCode))
 
 	var ssotoken *ssooidc.CreateTokenOutput
 	for {
@@ -417,7 +433,7 @@ func ssoLogin(ctx context.Context, profile string, i *ini.Ini, disableCache bool
 			ClientId:     register.ClientId,
 			ClientSecret: register.ClientSecret,
 			DeviceCode:   deviceAuth.DeviceCode,
-			GrantType:    awsv2.String(grantType),
+			GrantType:    aws.String(grantType),
 		})
 		if err == nil {
 			break
@@ -435,8 +451,8 @@ func ssoLogin(ctx context.Context, profile string, i *ini.Ini, disableCache bool
 
 	creds, err := ssoClient.GetRoleCredentials(ctx, &sso.GetRoleCredentialsInput{
 		AccessToken: ssotoken.AccessToken,
-		AccountId:   awsv2.String(i.GetKey(profile, "sso_account_id")),
-		RoleName:    awsv2.String(i.GetKey(profile, "sso_role_name")),
+		AccountId:   aws.String(i.GetKey(profile, "sso_account_id")),
+		RoleName:    aws.String(i.GetKey(profile, "sso_role_name")),
 	})
 	if err != nil {
 		return nil, err
@@ -448,11 +464,11 @@ func ssoLogin(ctx context.Context, profile string, i *ini.Ini, disableCache bool
 			return nil, err
 		}
 		d := cacheData{
-			StartUrl:              ssoStartURL,
+			StartURL:              ssoStartURL,
 			Region:                i.GetKey(profile, "region"),
 			AccessToken:           *ssotoken.AccessToken,
 			ExpiresAt:             time.Unix(time.Now().Unix()+int64(ssotoken.ExpiresIn), 0).UTC(),
-			ClientId:              *register.ClientId,
+			ClientID:              *register.ClientId,
 			ClientSecret:          *register.ClientSecret,
 			RegistrationExpiresAt: time.Unix(register.ClientSecretExpiresAt, 0).UTC(),
 		}
@@ -471,38 +487,51 @@ func ssoLogin(ctx context.Context, profile string, i *ini.Ini, disableCache bool
 
 	return &token{
 		Region:          i.GetKey(profile, "region"),
-		AccessKeyId:     *creds.RoleCredentials.AccessKeyId,
+		AccessKeyID:     *creds.RoleCredentials.AccessKeyId,
 		SecretAccessKey: *creds.RoleCredentials.SecretAccessKey,
 		SessionToken:    *creds.RoleCredentials.SessionToken,
 	}, nil
 }
 
-func saveSessionTokenAsCache(key string, creds *sts.Credentials) error {
+func saveSessionTokenAsCache(key string, creds *types.Credentials) error {
 	if _, err := os.Stat(dataPath()); err != nil {
 		if err := os.MkdirAll(dataPath(), 0700); err != nil {
 			return err
 		}
 	}
-	out, err := json.Marshal(creds)
+	// Convert to Credentials for caching
+	ccreds := &Credentials{
+		AccessKeyID:     creds.AccessKeyId,
+		SecretAccessKey: creds.SecretAccessKey,
+		SessionToken:    creds.SessionToken,
+		Expiration:      creds.Expiration,
+	}
+	out, err := json.Marshal(ccreds)
 	if err != nil {
 		return err
 	}
 	return os.WriteFile(cachePath(key), out, 0600)
 }
 
-func getSessionTokenFromCache(key string) (*sts.Credentials, error) {
-	var creds sts.Credentials
+func getSessionTokenFromCache(key string) (*types.Credentials, error) {
+	var ccreds Credentials
 	cache, err := os.ReadFile(cachePath(key))
 	if err != nil {
-		return &creds, err
+		return nil, err
 	}
-	if err := json.Unmarshal(cache, &creds); err != nil {
-		return &creds, err
+	if err := json.Unmarshal(cache, &ccreds); err != nil {
+		return nil, err
 	}
-	if time.Now().After(*creds.Expiration) {
-		return &creds, errors.New("session token expired")
+	if time.Now().After(*ccreds.Expiration) {
+		return nil, errors.New("session token expired")
 	}
-	return &creds, nil
+	// Convert back to types.Credentials
+	return &types.Credentials{
+		AccessKeyId:     ccreds.AccessKeyID,
+		SecretAccessKey: ccreds.SecretAccessKey,
+		SessionToken:    ccreds.SessionToken,
+		Expiration:      ccreds.Expiration,
+	}, nil
 }
 
 func cachePath(key string) string {
