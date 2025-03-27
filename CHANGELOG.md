@@ -1,5 +1,8 @@
 # Changelog
 
+## [v1.3.0](https://github.com/k1LoW/awsdo/compare/v1.2.1...v1.3.0) - 2025-03-27
+- refactor: use aws-sdk-go-v2 instead of v1 by @k1LoW in https://github.com/k1LoW/awsdo/pull/65
+
 ## [v1.2.1](https://github.com/k1LoW/awsdo/compare/v1.2.0...v1.2.1) - 2025-03-26
 - fix: fix ini handling by @k1LoW in https://github.com/k1LoW/awsdo/pull/63
 
