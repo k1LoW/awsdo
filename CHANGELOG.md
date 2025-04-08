@@ -1,5 +1,8 @@
 # Changelog
 
+## [v1.3.1](https://github.com/k1LoW/awsdo/compare/v1.3.0...v1.3.1) - 2025-04-08
+- chore(deps): bump the dependencies group across 1 directory with 6 updates by @dependabot in https://github.com/k1LoW/awsdo/pull/67
+
 ## [v1.3.0](https://github.com/k1LoW/awsdo/compare/v1.2.1...v1.3.0) - 2025-03-27
 - refactor: use aws-sdk-go-v2 instead of v1 by @k1LoW in https://github.com/k1LoW/awsdo/pull/65
 
