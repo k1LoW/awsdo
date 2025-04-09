@@ -494,8 +494,8 @@ func ssoLogin(ctx context.Context, profile string, i *ini.Ini, disableCache bool
 }
 
 func saveSessionTokenAsCache(key string, creds *types.Credentials) error {
-	if _, err := os.Stat(dataPath()); err != nil {
-		if err := os.MkdirAll(dataPath(), 0700); err != nil {
+	if _, err := os.Stat(statePath()); err != nil {
+		if err := os.MkdirAll(statePath(), 0700); err != nil {
 			return err
 		}
 	}
@@ -536,14 +536,14 @@ func getSessionTokenFromCache(key string) (*types.Credentials, error) {
 
 func cachePath(key string) string {
 	r := strings.NewReplacer(":", "_", "/", "_")
-	return filepath.Join(dataPath(), fmt.Sprintf("%s.json", r.Replace(key)))
+	return filepath.Join(statePath(), fmt.Sprintf("%s.json", r.Replace(key)))
 }
 
-func dataPath() string {
-	p := os.Getenv("XDG_DATA_HOME")
+func statePath() string {
+	p := os.Getenv("XDG_STATE_HOME")
 	if p == "" {
 		home, _ := os.UserHomeDir()
-		p = filepath.Join(home, ".local", "share")
+		p = filepath.Join(home, ".local", "state")
 	}
 	return filepath.Join(p, "awsdo")
 }
