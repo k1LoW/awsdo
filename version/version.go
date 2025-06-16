@@ -4,4 +4,4 @@ package version
 const Name string = "awsdo"
 
 // Version for this.
-var Version = "1.3.2"
+var Version = "1.3.3"
