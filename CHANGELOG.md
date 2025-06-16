@@ -1,5 +1,8 @@
 # Changelog
 
+## [v1.3.3](https://github.com/k1LoW/awsdo/compare/v1.3.2...v1.3.3) - 2025-06-16
+- chore(deps): bump the dependencies group with 7 updates by @dependabot in https://github.com/k1LoW/awsdo/pull/73
+
 ## [v1.3.2](https://github.com/k1LoW/awsdo/compare/v1.3.1...v1.3.2) - 2025-06-09
 - chore(deps): bump the dependencies group across 1 directory with 4 updates by @dependabot in https://github.com/k1LoW/awsdo/pull/70
 - chore(deps): bump the dependencies group with 3 updates by @dependabot in https://github.com/k1LoW/awsdo/pull/72
