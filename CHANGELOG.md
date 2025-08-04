@@ -1,5 +1,11 @@
 # Changelog
 
+## [v1.3.4](https://github.com/k1LoW/awsdo/compare/v1.3.3...v1.3.4) - 2025-08-04
+- chore(deps): bump the dependencies group with 7 updates by @dependabot[bot] in https://github.com/k1LoW/awsdo/pull/75
+- chore(deps): bump github.com/aws/aws-sdk-go-v2/service/iam from 1.42.2 to 1.43.0 in the dependencies group by @dependabot[bot] in https://github.com/k1LoW/awsdo/pull/77
+- chore(deps): bump the dependencies group with 7 updates by @dependabot[bot] in https://github.com/k1LoW/awsdo/pull/78
+- chore(deps): bump the dependencies group with 7 updates by @dependabot[bot] in https://github.com/k1LoW/awsdo/pull/79
+
 ## [v1.3.3](https://github.com/k1LoW/awsdo/compare/v1.3.2...v1.3.3) - 2025-06-16
 - chore(deps): bump the dependencies group with 7 updates by @dependabot in https://github.com/k1LoW/awsdo/pull/73
 
