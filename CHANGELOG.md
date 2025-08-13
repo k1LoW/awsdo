@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.4.0](https://github.com/k1LoW/awsdo/compare/v1.3.4...v1.4.0) - 2025-08-13
+- fix: Use XDG_STATE_HOME instead of XDG_DATA_HOME by @k1LoW in https://github.com/k1LoW/awsdo/pull/81
+- chore(deps): bump the dependencies group with 7 updates by @dependabot[bot] in https://github.com/k1LoW/awsdo/pull/80
+
 ## [v1.3.4](https://github.com/k1LoW/awsdo/compare/v1.3.3...v1.3.4) - 2025-08-04
 - chore(deps): bump the dependencies group with 7 updates by @dependabot[bot] in https://github.com/k1LoW/awsdo/pull/75
 - chore(deps): bump github.com/aws/aws-sdk-go-v2/service/iam from 1.42.2 to 1.43.0 in the dependencies group by @dependabot[bot] in https://github.com/k1LoW/awsdo/pull/77
