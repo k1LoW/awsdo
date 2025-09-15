@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.4.1](https://github.com/k1LoW/awsdo/compare/v1.4.0...v1.4.1) - 2025-09-15
+- chore(deps): bump the dependencies group across 1 directory with 8 updates by @dependabot[bot] in https://github.com/k1LoW/awsdo/pull/86
+- chore(deps): bump the dependencies group with 7 updates by @dependabot[bot] in https://github.com/k1LoW/awsdo/pull/87
+
 ## [v1.4.0](https://github.com/k1LoW/awsdo/compare/v1.3.4...v1.4.0) - 2025-08-13
 - fix: Use XDG_STATE_HOME instead of XDG_DATA_HOME by @k1LoW in https://github.com/k1LoW/awsdo/pull/81
 - chore(deps): bump the dependencies group with 7 updates by @dependabot[bot] in https://github.com/k1LoW/awsdo/pull/80
