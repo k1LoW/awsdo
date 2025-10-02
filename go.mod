@@ -1,6 +1,6 @@
 module github.com/k1LoW/awsdo
 
-go 1.23
+go 1.24
 
 require (
 	github.com/Songmu/prompter v0.5.1
