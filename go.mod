@@ -5,12 +5,12 @@ go 1.24
 require (
 	github.com/Songmu/prompter v0.5.1
 	github.com/aws/aws-sdk-go-v2 v1.39.6
-	github.com/aws/aws-sdk-go-v2/config v1.31.17
-	github.com/aws/aws-sdk-go-v2/credentials v1.18.21
-	github.com/aws/aws-sdk-go-v2/service/iam v1.49.2
-	github.com/aws/aws-sdk-go-v2/service/sso v1.30.1
-	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.35.5
-	github.com/aws/aws-sdk-go-v2/service/sts v1.39.1
+	github.com/aws/aws-sdk-go-v2/config v1.31.20
+	github.com/aws/aws-sdk-go-v2/credentials v1.18.24
+	github.com/aws/aws-sdk-go-v2/service/iam v1.50.2
+	github.com/aws/aws-sdk-go-v2/service/sso v1.30.3
+	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.35.7
+	github.com/aws/aws-sdk-go-v2/service/sts v1.40.2
 	github.com/k1LoW/duration v1.2.0
 	github.com/mattn/go-isatty v0.0.20
 	github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c
