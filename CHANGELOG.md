@@ -1,5 +1,16 @@
 # Changelog
 
+## [v1.4.3](https://github.com/k1LoW/awsdo/compare/v1.4.2...v1.4.3) - 2025-12-01
+- chore: setup tagpr labels by @k1LoW in https://github.com/k1LoW/awsdo/pull/93
+- chore(deps): bump the dependencies group across 1 directory with 7 updates by @dependabot[bot] in https://github.com/k1LoW/awsdo/pull/92
+- chore(deps): bump the dependencies group with 7 updates by @dependabot[bot] in https://github.com/k1LoW/awsdo/pull/95
+- chore(deps): bump the dependencies group with 7 updates by @dependabot[bot] in https://github.com/k1LoW/awsdo/pull/96
+- chore(deps): bump the dependencies group with 7 updates by @dependabot[bot] in https://github.com/k1LoW/awsdo/pull/97
+- chore(deps): bump the dependencies group with 6 updates by @dependabot[bot] in https://github.com/k1LoW/awsdo/pull/98
+- chore(deps): bump the dependencies group with 7 updates by @dependabot[bot] in https://github.com/k1LoW/awsdo/pull/100
+- chore(deps): bump actions/checkout from 5 to 6 in the dependencies group by @dependabot[bot] in https://github.com/k1LoW/awsdo/pull/99
+- chore(deps): bump the dependencies group with 6 updates by @dependabot[bot] in https://github.com/k1LoW/awsdo/pull/101
+
 ## [v1.4.2](https://github.com/k1LoW/awsdo/compare/v1.4.1...v1.4.2) - 2025-10-02
 - chore(deps): bump the dependencies group with 7 updates by @dependabot[bot] in https://github.com/k1LoW/awsdo/pull/89
 - chore(deps): bump the dependencies group across 1 directory with 2 updates by @dependabot[bot] in https://github.com/k1LoW/awsdo/pull/85
