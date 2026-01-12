@@ -1,5 +1,8 @@
 # Changelog
 
+## [v1.4.4](https://github.com/k1LoW/awsdo/compare/v1.4.3...v1.4.4) - 2026-01-12
+- chore(deps): bump the dependencies group with 8 updates by @dependabot[bot] in https://github.com/k1LoW/awsdo/pull/104
+
 ## [v1.4.3](https://github.com/k1LoW/awsdo/compare/v1.4.2...v1.4.3) - 2025-12-22
 - chore: setup tagpr labels by @k1LoW in https://github.com/k1LoW/awsdo/pull/93
 - chore(deps): bump the dependencies group across 1 directory with 7 updates by @dependabot[bot] in https://github.com/k1LoW/awsdo/pull/92
