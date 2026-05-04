@@ -1,5 +1,13 @@
 # Changelog
 
+## [v1.4.4](https://github.com/k1LoW/awsdo/compare/v1.4.3...v1.4.4) - 2026-05-04
+- chore(deps): bump the dependencies group with 8 updates by @dependabot[bot] in https://github.com/k1LoW/awsdo/pull/104
+- chore(deps): bump goreleaser/goreleaser-action from 6 to 7 in the dependencies group by @dependabot[bot] in https://github.com/k1LoW/awsdo/pull/106
+- chore(deps): bump the dependencies group with 4 updates by @dependabot[bot] in https://github.com/k1LoW/awsdo/pull/107
+- chore(deps): bump the dependencies group across 1 directory with 8 updates by @dependabot[bot] in https://github.com/k1LoW/awsdo/pull/109
+- chore(deps): bump the dependencies group with 7 updates by @dependabot[bot] in https://github.com/k1LoW/awsdo/pull/110
+- chore(deps): bump the dependencies group with 9 updates by @dependabot[bot] in https://github.com/k1LoW/awsdo/pull/111
+
 ## [v1.4.3](https://github.com/k1LoW/awsdo/compare/v1.4.2...v1.4.3) - 2025-12-22
 - chore: setup tagpr labels by @k1LoW in https://github.com/k1LoW/awsdo/pull/93
 - chore(deps): bump the dependencies group across 1 directory with 7 updates by @dependabot[bot] in https://github.com/k1LoW/awsdo/pull/92
