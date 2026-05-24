@@ -1,5 +1,8 @@
 # Changelog
 
+## [v1.4.5](https://github.com/k1LoW/awsdo/compare/v1.4.4...v1.4.5) - 2026-05-24
+- chore(deps): bump the dependencies group with 3 updates by @dependabot[bot] in https://github.com/k1LoW/awsdo/pull/112
+
 ## [v1.4.4](https://github.com/k1LoW/awsdo/compare/v1.4.3...v1.4.4) - 2026-05-04
 - chore(deps): bump the dependencies group with 8 updates by @dependabot[bot] in https://github.com/k1LoW/awsdo/pull/104
 - chore(deps): bump goreleaser/goreleaser-action from 6 to 7 in the dependencies group by @dependabot[bot] in https://github.com/k1LoW/awsdo/pull/106
