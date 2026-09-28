@@ -29,25 +29,27 @@ build:
 
 depsdev:
 	go install github.com/Songmu/ghch/cmd/ghch@latest
-	go install github.com/Songmu/gocredits/cmd/gocredits@latest
 	go install github.com/securego/gosec/v2/cmd/gosec@latest
+
+credits:
+	go install github.com/Songmu/gocredits/cmd/gocredits@v1.0.0
+	gocredits . > CREDITS
+	cat _EXTRA_CREDITS >> CREDITS
 
 prerelease:
 	git pull origin main --tag
 	ghch -w -N ${VER}
-	gocredits -w
-	cat _EXTRA_CREDITS >> CREDITS
+	$(MAKE) credits
 	git add CHANGELOG.md CREDITS go.mod go.sum
 	git commit -m'Bump up version number'
 	git tag ${VER}
 
-prerelease_for_tagpr: depsdev
-	gocredits -w .
-	cat _EXTRA_CREDITS >> CREDITS
+prerelease_for_tagpr:
+	$(MAKE) credits
 	git add CHANGELOG.md CREDITS go.mod go.sum
 
 release:
 	git push origin main --tag
 	goreleaser --clean
 
-.PHONY: default test
+.PHONY: default test credits
