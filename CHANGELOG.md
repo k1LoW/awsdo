@@ -1,5 +1,13 @@
 # Changelog
 
+## [v1.4.5](https://github.com/k1LoW/awsdo/compare/v1.4.4...v1.4.5) - 2026-09-29
+
+- chore(deps): bump the dependencies group with 3 updates by @dependabot[bot] in https://github.com/k1LoW/awsdo/pull/112
+- chore(deps): bump actions/checkout from 6 to 7 in the dependencies group by @dependabot[bot] in https://github.com/k1LoW/awsdo/pull/116
+- ci: generate CREDITS with gocredits v1.0.0 from a make target by @k1LoW in https://github.com/k1LoW/awsdo/pull/122
+- chore(deps): bump the dependencies group across 1 directory with 4 updates by @dependabot[bot] in https://github.com/k1LoW/awsdo/pull/121
+- chore(deps): bump the dependencies group across 1 directory with 9 updates by @dependabot[bot] in https://github.com/k1LoW/awsdo/pull/120
+
 ## [v1.4.4](https://github.com/k1LoW/awsdo/compare/v1.4.3...v1.4.4) - 2026-05-04
 - chore(deps): bump the dependencies group with 8 updates by @dependabot[bot] in https://github.com/k1LoW/awsdo/pull/104
 - chore(deps): bump goreleaser/goreleaser-action from 6 to 7 in the dependencies group by @dependabot[bot] in https://github.com/k1LoW/awsdo/pull/106
